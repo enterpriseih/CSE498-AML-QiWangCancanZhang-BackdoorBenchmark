@@ -9,4 +9,7 @@ then
 elif [ "$attack" = "WaNet" ]
 then
     python models/Warping-based_Backdoor_Attack-release-main/train.py --dataset $dataset --attack_mode all2one
+elif [ "$attack" = "BadNet" ]
+then
+    python models/BadNet/train.py --dataset $dataset --attack_mode all2one    
 fi
