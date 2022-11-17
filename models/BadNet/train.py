@@ -47,10 +47,8 @@ def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_
 
     total_clean = 0
     total_bd = 0
-    total_cross = 0
     total_clean_correct = 0
     total_bd_correct = 0
-    total_cross_correct = 0
     criterion_CE = torch.nn.CrossEntropyLoss()
     criterion_BCE = torch.nn.BCELoss()
 
@@ -58,7 +56,6 @@ def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_
     transforms = PostTensorTransform(opt).to(opt.device)
     total_time = 0
 
-    avg_acc_cross = 0
 
     for batch_idx, (inputs, targets) in enumerate(train_dl):
         optimizerC.zero_grad()
@@ -66,19 +63,20 @@ def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_
         inputs, targets = inputs.to(opt.device), targets.to(opt.device)
         bs = inputs.shape[0]
 
-        # Create backdoor data
+        # Create backdoor data for badnet
         num_bd = int(bs * rate_bd)
+        inputs_bd = inputs[:num_bd] 
+        for i in range(1,4):
+            for j in range(1,4):
+                inputs_bd[:,:,i,j] = 255
 
-
-        inputs_bd = F.grid_sample(inputs[:num_bd], grid_temps.repeat(num_bd, 1, 1, 1), align_corners=True)
         if opt.attack_mode == "all2one":
             targets_bd = torch.ones_like(targets[:num_bd]) * opt.target_label
         if opt.attack_mode == "all2all":
             targets_bd = torch.remainder(targets[:num_bd] + 1, opt.num_classes)
 
-        inputs_cross = F.grid_sample(inputs[num_bd : (num_bd + num_cross)], grid_temps2, align_corners=True)
 
-        total_inputs = torch.cat([inputs_bd, inputs_cross, inputs[(num_bd + num_cross) :]], dim=0)
+        total_inputs = torch.cat([inputs_bd, inputs[num_bd:]], dim=0)
         total_inputs = transforms(total_inputs)
         total_targets = torch.cat([targets_bd, targets[num_bd:]], dim=0)
         start = time()
@@ -95,35 +93,21 @@ def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_
         total_sample += bs
         total_loss_ce += loss_ce.detach()
 
-        total_clean += bs - num_bd - num_cross
+        total_clean += bs - num_bd
         total_bd += num_bd
-        total_cross += num_cross
         total_clean_correct += torch.sum(
-            torch.argmax(total_preds[(num_bd + num_cross) :], dim=1) == total_targets[(num_bd + num_cross) :]
+            torch.argmax(total_preds[num_bd:], dim=1) == total_targets[num_bd :]
         )
         total_bd_correct += torch.sum(torch.argmax(total_preds[:num_bd], dim=1) == targets_bd)
-        if num_cross:
-            total_cross_correct += torch.sum(
-                torch.argmax(total_preds[num_bd : (num_bd + num_cross)], dim=1)
-                == total_targets[num_bd : (num_bd + num_cross)]
-            )
-            avg_acc_cross = total_cross_correct * 100.0 / total_cross
+     
 
         avg_acc_clean = total_clean_correct * 100.0 / total_clean
         avg_acc_bd = total_bd_correct * 100.0 / total_bd
 
         avg_loss_ce = total_loss_ce / total_sample
 
-        if num_cross:
-            progress_bar(
-                batch_idx,
-                len(train_dl),
-                "CE Loss: {:.4f} | Clean Acc: {:.4f} | Bd Acc: {:.4f} | Cross Acc: {:.4f}".format(
-                    avg_loss_ce, avg_acc_clean, avg_acc_bd, avg_acc_cross
-                ),
-            )
-        else:
-            progress_bar(
+        
+        progress_bar(
                 batch_idx,
                 len(train_dl),
                 "CE Loss: {:.4f} | Clean Acc: {:.4f} | Bd Acc: {:.4f} ".format(avg_loss_ce, avg_acc_clean, avg_acc_bd),
@@ -147,7 +131,7 @@ def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_
     # for tensorboard
     if not epoch % 1:
         tf_writer.add_scalars(
-            "Clean Accuracy", {"Clean": avg_acc_clean, "Bd": avg_acc_bd, "Cross": avg_acc_cross}, epoch
+            "Clean Accuracy", {"Clean": avg_acc_clean, "Bd": avg_acc_bd}, epoch
         )
         tf_writer.add_image("Images", grid, global_step=epoch)
 
@@ -163,7 +147,6 @@ def eval(
     identity_grid,
     best_clean_acc,
     best_bd_acc,
-    best_cross_acc,
     tf_writer,
     epoch,
     opt,
@@ -174,7 +157,6 @@ def eval(
     total_sample = 0
     total_clean_correct = 0
     total_bd_correct = 0
-    total_cross_correct = 0
     total_ae_loss = 0
 
     criterion_BCE = torch.nn.BCELoss()
@@ -190,14 +172,11 @@ def eval(
             total_clean_correct += torch.sum(torch.argmax(preds_clean, 1) == targets)
 
             # Evaluate Backdoor
-            grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
-            grid_temps = torch.clamp(grid_temps, -1, 1)
+            inputs_bd = inputs
+            for i in range(1,4):
+                for j in range(1,4):
+                    inputs_bd[:,:,i,j] = 255
 
-            ins = torch.rand(bs, opt.input_height, opt.input_height, 2).to(opt.device) * 2 - 1
-            grid_temps2 = grid_temps.repeat(bs, 1, 1, 1) + ins / opt.input_height
-            grid_temps2 = torch.clamp(grid_temps2, -1, 1)
-
-            inputs_bd = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
             if opt.attack_mode == "all2one":
                 targets_bd = torch.ones_like(targets) * opt.target_label
             if opt.attack_mode == "all2all":
@@ -208,21 +187,8 @@ def eval(
             acc_clean = total_clean_correct * 100.0 / total_sample
             acc_bd = total_bd_correct * 100.0 / total_sample
 
-            # Evaluate cross
-            if opt.cross_ratio:
-                inputs_cross = F.grid_sample(inputs, grid_temps2, align_corners=True)
-                preds_cross = netC(inputs_cross)
-                total_cross_correct += torch.sum(torch.argmax(preds_cross, 1) == targets)
-
-                acc_cross = total_cross_correct * 100.0 / total_sample
-
-                info_string = (
-                    "Clean Acc: {:.4f} - Best: {:.4f} | Bd Acc: {:.4f} - Best: {:.4f} | Cross: {:.4f}".format(
-                        acc_clean, best_clean_acc, acc_bd, best_bd_acc, acc_cross, best_cross_acc
-                    )
-                )
-            else:
-                info_string = "Clean Acc: {:.4f} - Best: {:.4f} | Bd Acc: {:.4f} - Best: {:.4f}".format(
+            
+            info_string = "Clean Acc: {:.4f} - Best: {:.4f} | Bd Acc: {:.4f} - Best: {:.4f}".format(
                     acc_clean, best_clean_acc, acc_bd, best_bd_acc
                 )
             progress_bar(batch_idx, len(test_dl), info_string)
@@ -236,17 +202,12 @@ def eval(
         print(" Saving...")
         best_clean_acc = acc_clean
         best_bd_acc = acc_bd
-        if opt.cross_ratio:
-            best_cross_acc = acc_cross
-        else:
-            best_cross_acc = torch.tensor([0])
         state_dict = {
             "netC": netC.state_dict(),
             "schedulerC": schedulerC.state_dict(),
             "optimizerC": optimizerC.state_dict(),
             "best_clean_acc": best_clean_acc,
             "best_bd_acc": best_bd_acc,
-            "best_cross_acc": best_cross_acc,
             "epoch_current": epoch,
             "identity_grid": identity_grid,
             "noise_grid": noise_grid,
@@ -256,11 +217,10 @@ def eval(
             results_dict = {
                 "clean_acc": best_clean_acc.item(),
                 "bd_acc": best_bd_acc.item(),
-                "cross_acc": best_cross_acc.item(),
             }
             json.dump(results_dict, f, indent=2)
 
-    return best_clean_acc, best_bd_acc, best_cross_acc
+    return best_clean_acc, best_bd_acc
 
 
 def main():
@@ -330,7 +290,6 @@ def main():
         print("Train from scratch!!!")
         best_clean_acc = 0.0
         best_bd_acc = 0.0
-        best_cross_acc = 0.0
         epoch_current = 0
 
         # Prepare grid
@@ -354,7 +313,7 @@ def main():
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
         train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_writer, epoch, opt)
-        best_clean_acc, best_bd_acc, best_cross_acc = eval(
+        best_clean_acc, best_bd_acc= eval(
             netC,
             optimizerC,
             schedulerC,
@@ -363,7 +322,6 @@ def main():
             identity_grid,
             best_clean_acc,
             best_bd_acc,
-            best_cross_acc,
             tf_writer,
             epoch,
             opt,

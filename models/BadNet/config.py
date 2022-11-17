@@ -7,7 +7,7 @@ def get_arguments():
     parser.add_argument("--data_root", type=str, default="./data")
     parser.add_argument("--checkpoints", type=str, default="./checkpoints/badnet")
     parser.add_argument("--temps", type=str, default="./temps")
-    parser.add_argument("--device", type=str, default="cuda")
+    parser.add_argument("--device", type=str, default="cuda:1")
     parser.add_argument("--continue_training", action="store_true")
 
     parser.add_argument("--dataset", type=str, default="cifar10")
