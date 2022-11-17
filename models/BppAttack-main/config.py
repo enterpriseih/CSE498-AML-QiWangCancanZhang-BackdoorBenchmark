@@ -4,12 +4,12 @@ import argparse
 def get_arguments():
     parser = argparse.ArgumentParser()
 
-    parser.add_argument("--data_root", type=str, default="../../data/")
-    parser.add_argument("--checkpoints", type=str, default="./checkpoints")
+    parser.add_argument("--data_root", type=str, default="./data")
+    parser.add_argument("--checkpoints", type=str, default="./checkpoints/bppattack")
     parser.add_argument("--temps", type=str, default="./temps")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--continue_training", action="store_true")
-    parser.add_argument("--model_filepath", type=str, default="./checkpoints")
+    parser.add_argument("--model_filepath", type=str, default="./checkpoints/bppattack")
     parser.add_argument("--dataset", type=str, default="cifar10")
     parser.add_argument("--set_arch", type=str, default=None)
     parser.add_argument("--attack_mode", type=str, default="all2one")
