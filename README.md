@@ -12,11 +12,20 @@ WaNet 2021
 
 BadNet 2016
 
+1. train with dataset and save backdoored checkpoint
+2. evaluate and save performance (BA, ASR)
 
 ## Defense
 channel-Lipschitzness-based-pruning 2022
 
+1. load backdoored checkpoint
+2. revise checkpoint and save defensed checkpoint
+3. evaluate and save performance (BA, ASR for defensed checkpoint)
 
+
+## Task
+1. Can: revise BppAttack, WaNet, and BadNet realize pass dasaset_path and checkpoint_path to attack train. 
+2. attack eval: pass performance path_log to evaluate.
 
 
 
