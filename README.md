@@ -37,6 +37,6 @@ nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> train_wanet &
 
 sh test.sh WaNet cifar10
 
-nohup sh train.sh BadNet cifar10  'cuda:2' 50 &> train_badnet &
+nohup sh train.sh BadNet cifar10  'cuda:3' 50 &> train_badnet &
 
 Notes: BadNet is written based on WaNet file (can be combined together in the future)
