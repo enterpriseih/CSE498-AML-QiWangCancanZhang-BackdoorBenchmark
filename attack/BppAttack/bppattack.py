@@ -506,7 +506,8 @@ def main():
     if opt.dataset == "celeba":
         n = 1
     else:
-        n = 5
+        #n = 5
+        n = 2 # cuda memory issue
         
     for j in range(n):
         for batch_idx, (inputs, targets) in enumerate(train_dl):
