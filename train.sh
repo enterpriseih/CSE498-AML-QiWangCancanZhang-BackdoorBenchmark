@@ -9,8 +9,8 @@ then
     python -u attack/$attack/bppattack.py --dataset $dataset --attack_mode all2one --squeeze_num 32
 elif [ "$attack" = "WaNet" ]
 then
-    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attck}/${dataset}/"
+    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/"
 elif [ "$attack" = "BadNet" ]
 then
-    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attck}/${dataset}/"
+    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/"
 fi
