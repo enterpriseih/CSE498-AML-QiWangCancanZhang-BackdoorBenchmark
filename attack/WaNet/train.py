@@ -258,8 +258,9 @@ def eval(
             "noise_grid": noise_grid,
         }
         torch.save(state_dict, opt.ckpt_path)
-        with open(os.path.join(opt.ckpt_folder, "results.txt"), "w+") as f:
+        with open(os.path.join(opt.ckpt_folder, "best_results.txt"), "w+") as f:
             results_dict = {
+                "epoch": epoch,
                 "clean_acc": best_clean_acc.item(),
                 "bd_acc": best_bd_acc.item(),
                 "cross_acc": best_cross_acc.item(),

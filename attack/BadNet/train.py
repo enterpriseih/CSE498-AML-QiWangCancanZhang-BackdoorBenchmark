@@ -215,6 +215,7 @@ def eval(
         torch.save(state_dict, opt.ckpt_path)
         with open(os.path.join(opt.ckpt_folder, "results.txt"), "w+") as f:
             results_dict = {
+                "epoch": epoch,
                 "clean_acc": best_clean_acc.item(),
                 "bd_acc": best_bd_acc.item(),
             }
