@@ -203,7 +203,7 @@ def train(train_transform, model, optimizer, scheduler, train_dl, tf_writer, epo
             inputs_bd = back_to_np_4d(inputs[:num_bd],opt)
             if opt.dithering:
                 for i in range(inputs_bd.shape[0]):
-                    inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).cuda())
+                    inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).to(opt.device))
             else:
                 inputs_bd = torch.round(inputs_bd/255.0*(squeeze_num-1))/(squeeze_num-1)*255
                 
@@ -354,7 +354,7 @@ def eval(
             inputs_bd = back_to_np_4d(inputs,opt)
             if opt.dithering:
                 for i in range(inputs_bd.shape[0]):
-                    inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).cuda())
+                    inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).to(opt.device))
 
             else:
                 inputs_bd = torch.round(inputs_bd/255.0*(squeeze_num-1))/(squeeze_num-1)*255
@@ -527,7 +527,7 @@ def main():
 
             residual = temp_negetive_modified - temp_negetive
             for i in range(residual.shape[0]):
-                residual_list_train.append(residual[i].unsqueeze(0).cuda())
+                residual_list_train.append(residual[i].unsqueeze(0).to(opt.device))
                 count = count + 1
     #print(count)
     
@@ -537,7 +537,7 @@ def main():
         temp_negetive = back_to_np_4d(inputs,opt)
         residual = torch.round(temp_negetive/255.0*(opt.squeeze_num-1))/(opt.squeeze_num-1)*255 - temp_negetive
         for i in range(residual.shape[0]):
-            residual_list_test.append(residual[i].unsqueeze(0).cuda())
+            residual_list_test.append(residual[i].unsqueeze(0).to(opt.device))
             count = count + 1
 
     for epoch in range(epoch_current, opt.n_iters):
