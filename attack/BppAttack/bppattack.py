@@ -190,8 +190,6 @@ def train(train_transform, model, optimizer, scheduler, train_dl, tf_writer, epo
             if opt.attack_mode == "all2all":
                 targets_bd = torch.remainder(targets[:num_bd] + 1, opt.num_classes)
 
-            print (back_to_np_4d(inputs[num_bd : (num_bd + num_neg)],opt).get_device())
-            print (torch.cat(random.sample(residual_list_train,num_neg),dim=0).get_device())
             inputs_negative = back_to_np_4d(inputs[num_bd : (num_bd + num_neg)],opt) + torch.cat(random.sample(residual_list_train,num_neg),dim=0)
             inputs_negative=torch.clamp(inputs_negative,0,255)
             inputs_negative = np_4d_to_tensor(inputs_negative,opt)
