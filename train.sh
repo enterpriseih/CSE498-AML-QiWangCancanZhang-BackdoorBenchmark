@@ -3,7 +3,7 @@
 attack=$1
 dataset=$2
 device=$3
-n_iters=50
+n_iters=$4
 batch_size=128
 
 if [ "$attack" = "BppAttack" ]
