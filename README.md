@@ -31,12 +31,12 @@ channel-Lipschitzness-based-pruning 2022
 
 
 ## How to Attack
-sh train.sh BppAttack cifar10
+nohup sh train.sh BppAttack cifar10 'cuda:1' 50 &> train_bppattack &
 
-sh train.sh WaNet cifar10
+nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> train_wanet &
 
 sh test.sh WaNet cifar10
 
-sh train.sh BadNet cifar10
+nohup sh train.sh BadNet cifar10  'cuda:2' 50 &> train_badnet &
 
 Notes: BadNet is written based on WaNet file (can be combined together in the future)
