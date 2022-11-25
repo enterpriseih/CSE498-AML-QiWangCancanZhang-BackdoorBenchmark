@@ -176,8 +176,11 @@ def train(train_transform, model, optimizer, scheduler, train_dl, tf_writer, epo
         if num_bd!=0 and num_neg!=0:
             inputs_bd = back_to_np_4d(inputs[:num_bd],opt)
             if opt.dithering:
+                with torch.cuda.device(torch.device('cuda', 0)):
                 for i in range(inputs_bd.shape[0]):
-                    inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).cuda())
+                    #inputs_bd[i,:,:,:] = torch.round(torch.from_numpy(floydDitherspeed(inputs_bd[i].detach().cpu().numpy(),float(opt.squeeze_num))).cuda())
+                    inputs_bd[i, :, :, :] = torch.round(torch.from_numpy(
+                        floydDitherspeed(inputs_bd[i].detach().cpu().numpy(), float(opt.squeeze_num))).to(opt.device))
             else:
                 inputs_bd = torch.round(inputs_bd/255.0*(squeeze_num-1))/(squeeze_num-1)*255
 
