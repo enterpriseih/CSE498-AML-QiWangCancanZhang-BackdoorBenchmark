@@ -6,11 +6,11 @@ device=$3
 
 if [ "$attack" = "BppAttack" ]
 then 
-    python -u attack/$attack/bppattack.py --dataset $dataset --attack_mode all2one --squeeze_num 32
+    python -u attack/$attack/bppattack.py --dataset $dataset --attack_mode all2one --squeeze_num 32 --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device
 elif [ "$attack" = "WaNet" ]
 then
-    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/"
+    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device
 elif [ "$attack" = "BadNet" ]
 then
-    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/"
+    python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device
 fi
