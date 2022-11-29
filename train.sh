@@ -15,4 +15,7 @@ then
 elif [ "$attack" = "BadNet" ]
 then
     python attack/$attack/train.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device --n_iters $n_iters --bs $batch_size
+elif [ "$attack" = "Clean" ]
+then
+    python attack/$attack/train.py --dataset $dataset --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device --n_iters $n_iters --bs $batch_size
 fi
