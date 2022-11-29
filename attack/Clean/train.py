@@ -238,7 +238,7 @@ def main():
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
         train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt)
-        best_clean_acc, best_bd_acc= eval(
+        best_clean_acc= eval(
             netC,
             optimizerC,
             schedulerC,
