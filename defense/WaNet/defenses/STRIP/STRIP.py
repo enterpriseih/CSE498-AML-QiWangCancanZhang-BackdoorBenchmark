@@ -113,12 +113,23 @@ class STRIP:
         return self._get_entropy(background, dataset, classifier)
 
 
-def create_backdoor(inputs, identity_grid, noise_grid, opt):
-    bs = inputs.shape[0]
-    grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
-    grid_temps = torch.clamp(grid_temps, -1, 1)
+def create_backdoor(inputs, opt, **args):
+    if opt.attack == 'WaNet':
+        identity_grid = args['identity_grid']
+        noise_grid = args['noise_grid']
+        bs = inputs.shape[0]
+        grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
+        grid_temps = torch.clamp(grid_temps, -1, 1)
+        bd_inputs = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
+    elif opt.attack == 'BadNet':
+        bd_inputs = inputs
+        for i in range(1, 4):
+            for j in range(1, 4):
+                bd_inputs[:, :, i, j] = 255
+    elif opt.attack == 'BppAttack':
+        bd_inputs = []
+        # need to add in the following
 
-    bd_inputs = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
     return bd_inputs
 
 
@@ -137,12 +148,20 @@ def strip(opt, mode="clean"):
     # Load pretrained model
     mode = opt.attack_mode
     opt.ckpt_folder = os.path.join(opt.checkpoints, opt.dataset)
-    opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))
+    if os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))
+    elif os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, mode))
     opt.log_dir = os.path.join(opt.ckpt_folder, "log_dir")
 
     state_dict = torch.load(opt.ckpt_path)
-    netC.load_state_dict(state_dict["netC"])
-    if mode != "clean":
+    if "netC" in state_dict:
+        netC.load_state_dict(state_dict["netC"])
+    elif "model" in state_dict:
+        netC.load_state_dict(state_dict["model"])
+    else:
+        raise Exception("model not in state_dict, please check the model key in checkpoint")
+    if opt.attack == "WaNet" and mode != "clean":
         identity_grid = state_dict["identity_grid"]
         noise_grid = state_dict["noise_grid"]
     netC.requires_grad_(False)
@@ -167,7 +186,10 @@ def strip(opt, mode="clean"):
         print("Testing with bd data !!!!")
         inputs, targets = next(iter(test_dataloader))
         inputs = inputs.to(opt.device)
-        bd_inputs = create_backdoor(inputs, identity_grid, noise_grid, opt)
+        if opt.attack == 'WaNet':
+            bd_inputs = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
+        else:
+            bd_inputs = create_backdoor(inputs, opt)
 
         bd_inputs = denormalizer(bd_inputs) * 255.0
         bd_inputs = bd_inputs.detach().cpu().numpy()

@@ -11,6 +11,7 @@ def get_argument():
     parser.add_argument("--results", type=str, default="./results")
     parser.add_argument("--dataset", type=str, default="cifar10")
     parser.add_argument("--attack_mode", type=str, default="all2one")
+    parser.add_argument("--attack", type=str, default="wanet")
     parser.add_argument("--temps", type=str, default="./temps")
 
     # ---------------------------- For Neural Cleanse --------------------------
