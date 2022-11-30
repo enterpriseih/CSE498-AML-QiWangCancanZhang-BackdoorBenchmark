@@ -32,14 +32,25 @@ channel-Lipschitzness-based-pruning 2022
 
 ## How to Attack
 nohup sh train.sh Clean cifar10 'cuda:0' 50 &> train_clean &
+
 nohup sh train.sh BppAttack cifar10 'cuda:1' 50 &> train_bppattack &
+
 nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> train_wanet &
+
 nohup sh train.sh BadNet cifar10  'cuda:3' 50 &> train_badnet &
 
 nohup sh train.sh Clean mnist 'cuda:0' 50 &> train_clean &
+
 nohup sh train.sh BppAttack mnist 'cuda:1' 50 &> train_bppattack &
+
 nohup sh train.sh WaNet mnist 'cuda:2' 50 &> train_wanet &
+
 nohup sh train.sh BadNet mnist  'cuda:3' 50 &> train_badnet &
+
+
+## How to Defense
+
+
 
 
 
