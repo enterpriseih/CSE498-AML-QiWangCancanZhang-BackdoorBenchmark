@@ -16,8 +16,6 @@ then
 elif [ "$defense" = 'STRIP' ]
 then
   cd defense/WaNet/defenses/STRIP
-  python -u STRIP.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --result "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --bs $batch_size --epoch $epoch
+  python -u STRIP.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --result "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device
   cd $cur_dir
-
-
 fi
