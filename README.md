@@ -28,6 +28,8 @@ channel-Lipschitzness-based-pruning 2022
 2. attack eval: pass performance path_log to evaluate.
 
 
+# Modifications
+1. made it can run in any cuda machine
 
 
 ## How to Attack
@@ -49,6 +51,25 @@ nohup sh train.sh BadNet mnist  'cuda:3' 50 &> train_badnet &
 
 
 ## How to Defense
+
+nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> defense_badnet_nc &
+nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> defense_wanet_nc &
+nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> defense_bppattack_nc &
+
+
+
+
+
+neural_cleanse
+modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
+
+
+
+
+
+
+
+
 
 
 
