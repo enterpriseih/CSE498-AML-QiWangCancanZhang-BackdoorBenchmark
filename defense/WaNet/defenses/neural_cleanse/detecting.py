@@ -62,7 +62,7 @@ class RegressionModel(nn.Module):
             ckpt_path = os.path.join(
                 opt.checkpoints, opt.dataset, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode)
             )
-        elif os.path.exists(os.path.join(opt.checkpoints, opt.dataset, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))):
+        elif os.path.exists(os.path.join(opt.checkpoints, opt.dataset, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode))):
             ckpt_path = os.path.join(
                 opt.checkpoints, opt.dataset, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode)
             )
