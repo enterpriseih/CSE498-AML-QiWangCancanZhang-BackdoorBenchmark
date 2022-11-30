@@ -95,7 +95,8 @@ def main():
     else:
         raise Exception("Invalid Dataset")
 
-    result_path = os.path.join(opt.result, opt.dataset, opt.attack_mode)
+    result_path = os.path.join(opt.result, opt.attack_mode)
+    print ('result_path:',result_path)
     create_dir(result_path)
     opt.output_path = os.path.join(result_path, "{}_{}_output_clean.txt".format(opt.attack_mode, opt.dataset))
     if opt.to_file:
