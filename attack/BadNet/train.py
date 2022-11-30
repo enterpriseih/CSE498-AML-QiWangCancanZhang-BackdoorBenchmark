@@ -38,7 +38,7 @@ def get_model(opt):
     return netC, optimizerC, schedulerC
 
 
-def train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_writer, epoch, opt):
+def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
     print(" Train:")
     netC.train()
     rate_bd = opt.pc
@@ -143,8 +143,6 @@ def eval(
     optimizerC,
     schedulerC,
     test_dl,
-    noise_grid,
-    identity_grid,
     best_clean_acc,
     best_bd_acc,
     tf_writer,
@@ -209,8 +207,6 @@ def eval(
             "best_clean_acc": best_clean_acc,
             "best_bd_acc": best_bd_acc,
             "epoch_current": epoch,
-            "identity_grid": identity_grid,
-            "noise_grid": noise_grid,
         }
         torch.save(state_dict, opt.ckpt_path)
         with open(os.path.join(opt.ckpt_folder, "results.txt"), "w+") as f:
@@ -279,10 +275,7 @@ def main():
             schedulerC.load_state_dict(state_dict["schedulerC"])
             best_clean_acc = state_dict["best_clean_acc"]
             best_bd_acc = state_dict["best_bd_acc"]
-            best_cross_acc = state_dict["best_cross_acc"]
             epoch_current = state_dict["epoch_current"]
-            identity_grid = state_dict["identity_grid"]
-            noise_grid = state_dict["noise_grid"]
             tf_writer = SummaryWriter(log_dir=opt.log_dir)
         else:
             print("Pretrained model doesnt exist")
@@ -293,18 +286,6 @@ def main():
         best_bd_acc = 0.0
         epoch_current = 0
 
-        # Prepare grid
-        ins = torch.rand(1, 2, opt.k, opt.k) * 2 - 1
-        ins = ins / torch.mean(torch.abs(ins))
-        noise_grid = (
-            F.upsample(ins, size=opt.input_height, mode="bicubic", align_corners=True)
-            .permute(0, 2, 3, 1)
-            .to(opt.device)
-        )
-        array1d = torch.linspace(-1, 1, steps=opt.input_height)
-        x, y = torch.meshgrid(array1d, array1d)
-        identity_grid = torch.stack((y, x), 2)[None, ...].to(opt.device)
-
         shutil.rmtree(opt.ckpt_folder, ignore_errors=True)
         os.makedirs(opt.log_dir)
         with open(os.path.join(opt.ckpt_folder, "opt.json"), "w+") as f:
@@ -313,14 +294,12 @@ def main():
 
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
-        train(netC, optimizerC, schedulerC, train_dl, noise_grid, identity_grid, tf_writer, epoch, opt)
+        train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt)
         best_clean_acc, best_bd_acc= eval(
             netC,
             optimizerC,
             schedulerC,
             test_dl,
-            noise_grid,
-            identity_grid,
             best_clean_acc,
             best_bd_acc,
             tf_writer,
