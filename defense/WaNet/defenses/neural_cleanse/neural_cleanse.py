@@ -10,7 +10,7 @@ sys.path.insert(0, "../..")
 def create_dir(path_dir):
     list_subdir = path_dir.strip(".").split("/")
     list_subdir.remove("")
-    base_dir = "./"
+    base_dir = "" if list_subdir[1] == 'home' else "./"
     for subdir in list_subdir:
         base_dir = os.path.join(base_dir, subdir)
         try:
