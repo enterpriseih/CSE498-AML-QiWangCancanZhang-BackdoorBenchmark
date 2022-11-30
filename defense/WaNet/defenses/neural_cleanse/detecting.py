@@ -62,14 +62,20 @@ class RegressionModel(nn.Module):
             ckpt_path = os.path.join(
                 opt.checkpoints, opt.dataset, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode)
             )
-        else:
+        elif os.path.exists(os.path.join(opt.checkpoints, opt.dataset, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))):
             ckpt_path = os.path.join(
                 opt.checkpoints, opt.dataset, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode)
             )
-
+        else:
+            raise Exception("checkpoint path not right, please check")
 
         state_dict = torch.load(ckpt_path)
-        classifier.load_state_dict(state_dict["netC"])
+        if "netC" in state_dict:
+            classifier.load_state_dict(state_dict["netC"])
+        elif "model" in state_dict:
+            classifier.load_state_dict(state_dict["model"])
+        else:
+            raise Exception("model not in state_dict, please check the model key in checkpoint")
         for param in classifier.parameters():
             param.requires_grad = False
         classifier.eval()
