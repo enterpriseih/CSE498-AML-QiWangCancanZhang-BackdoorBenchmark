@@ -9,5 +9,5 @@ batch_size=128
 
 if [ "$defense" = 'neural_cleanse' ]
 then
-  python -u defense/WaNet/defenses/neural_cleanse.py --dataset $dataset --attack $attack --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/"
+  python -u defense/WaNet/defenses/neural_cleanse.py --dataset $dataset --attack $attack --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device
 fi
