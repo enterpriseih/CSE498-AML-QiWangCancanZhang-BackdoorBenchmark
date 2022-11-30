@@ -10,6 +10,6 @@ cur_dir=$PWD
 if [ "$defense" = 'neural_cleanse' ]
 then
   cd defense/WaNet/defenses/neural_cleanse
-  python -u neural_cleanse.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --device $device --bs $batch_size --epoch $epoch
+  python -u neural_cleanse.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --result "${cur_dir}/defense_result/${defense}/" --device $device --bs $batch_size --epoch $epoch
   cd $cur_dir
 fi
