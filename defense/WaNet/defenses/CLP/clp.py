@@ -184,15 +184,14 @@ def main():
     print ('result_path', result_path)
 
     with open(result_path, "w") as outs:
-        for index in range(pruning_mask.shape[0]):
-            net_clp = copy.deepcopy(netC)
-            CLP(net_clp, opt.u)
-            net_clp.to(opt.device)
-            if opt.attack == "WaNet":
-                clean, bd = eval(net_clp, test_dl, opt, identity_grid=identity_grid, noise_grid=noise_grid)
-            else:
-                clean, bd = eval(net_clp, test_dl, opt)
-            outs.write("%d %0.4f %0.4f\n" % (index, clean, bd))
+        net_clp = copy.deepcopy(netC)
+        CLP(net_clp, opt.u)
+        net_clp.to(opt.device)
+        if opt.attack == "WaNet":
+            clean, bd = eval(net_clp, test_dl, opt, identity_grid=identity_grid, noise_grid=noise_grid)
+        else:
+            clean, bd = eval(net_clp, test_dl, opt)
+        outs.write("%d %0.4f %0.4f\n" % (index, clean, bd))
 
 
 if __name__ == "__main__":
