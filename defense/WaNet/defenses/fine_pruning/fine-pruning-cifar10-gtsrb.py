@@ -14,6 +14,7 @@ from utils.utils import progress_bar
 from classifier_models import PreActResNet18
 
 
+
 def create_backdoor(inputs, opt, **args):
     if opt.attack == 'WaNet':
         identity_grid = args['identity_grid']
