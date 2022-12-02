@@ -63,13 +63,17 @@ nohup sh train.sh BadNet mnist  'cuda:3' 50 &> train_badnet &
 ## How to Defense
 
 nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> defense_badnet_nc &
+
 nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> defense_wanet_nc &
+
 nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> defense_bppattack_nc &
 
 nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> defense_badnet_strip &
+
 nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> defense_wanet_strip &
 
 nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> defense_badnet_fine_pruning &
+
 nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine_pruning_mnist &
 
 
@@ -77,10 +81,12 @@ nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine
 
 
 
-neural_cleanse
+### neural_cleanse
+
 modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
 
-STRIP / Fine_Pruning
+### STRIP / Fine_Pruning
+
 STRIP.py create_backdoor function, need to add methods generating bad inputs for different methods
 
 
