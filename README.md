@@ -30,8 +30,8 @@ WaNet
 BppAttack
 
 Defense:
-neural_cleanse
-STRIP (Not for BppAttack now)
+neural_cleanse (For all, do not need bad inputs)
+STRIP (For BadNet, WaNet now)
 FINE_PRUNING (PLAN: Friday)
 CLP (PLAN: Friday)
 
@@ -66,6 +66,10 @@ nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> defense_wanet_nc
 nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> defense_bppattack_nc &
 
 nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> defense_badnet_strip &
+nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> defense_wanet_strip &
+
+nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> defense_badnet_fine_pruning &
+nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine_pruning_mnist &
 
 
 
