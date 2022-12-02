@@ -23,9 +23,18 @@ channel-Lipschitzness-based-pruning 2022
 3. evaluate and save performance (BA, ASR for defensed checkpoint)
 
 
-## Task
-1. Can: revise BppAttack, WaNet, and BadNet realize pass dasaset_path and checkpoint_path to attack train. 
-2. attack eval: pass performance path_log to evaluate.
+## Current Progress
+Attack:
+BadNet ()
+WaNet
+BppAttack
+
+Defense:
+neural_cleanse
+STRIP (Not for BppAttack now)
+FINE_PRUNING (PLAN: Friday)
+CLP (PLAN: Friday)
+
 
 
 # Modifications
@@ -56,12 +65,18 @@ nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> defense_badnet_
 nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> defense_wanet_nc &
 nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> defense_bppattack_nc &
 
+nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> defense_badnet_strip &
+
+
 
 
 
 
 neural_cleanse
 modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
+
+STRIP
+STRIP.py create_backdoor function, need to add methods generating bad inputs for different methods
 
 
 
