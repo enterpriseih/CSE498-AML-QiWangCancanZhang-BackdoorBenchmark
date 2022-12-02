@@ -81,10 +81,12 @@ nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine
 
 
 
-neural_cleanse
+### neural_cleanse
+
 modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
 
-STRIP / Fine_Pruning
+### STRIP / Fine_Pruning
+
 STRIP.py create_backdoor function, need to add methods generating bad inputs for different methods
 
 
