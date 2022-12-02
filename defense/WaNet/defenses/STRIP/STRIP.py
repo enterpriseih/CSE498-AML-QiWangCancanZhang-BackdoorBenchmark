@@ -146,12 +146,16 @@ def strip(opt, mode="clean"):
         raise Exception("Invalid dataset")
 
     # Load pretrained model
-    mode = opt.attack_mode
+    #mode = opt.attack_mode
     opt.ckpt_folder = os.path.join(opt.checkpoints, opt.dataset)
-    if os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))):
-        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))
-    elif os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, mode))):
-        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, mode))
+    print ('ckpt_folder', opt.ckpt_folder)
+    if os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))
+    elif os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode))
+    else:
+        raise Exception("checkpoint path not right, please check")
+
     opt.log_dir = os.path.join(opt.ckpt_folder, "log_dir")
 
     state_dict = torch.load(opt.ckpt_path)
@@ -246,7 +250,7 @@ def main():
         mode = "attack"
     else:
         mode = "clean"
-
+    print ('opt',opt)
     lists_entropy_trojan = []
     lists_entropy_benign = []
     for test_round in range(opt.test_rounds):
@@ -255,13 +259,14 @@ def main():
         lists_entropy_benign += list_entropy_benign
 
     # Save result to file
-    result_dir = os.path.join(opt.results, opt.dataset)
+    result_dir = opt.results
     if not os.path.exists(result_dir):
         os.makedirs(result_dir)
     result_path = os.path.join(result_dir, opt.attack_mode)
     if not os.path.exists(result_path):
         os.makedirs(result_path)
     result_path = os.path.join("{}_{}_output.txt".format(opt.dataset, opt.attack_mode))
+    print ('result_path', result_path)
 
     with open(result_path, "w+") as f:
         for index in range(len(lists_entropy_trojan)):
