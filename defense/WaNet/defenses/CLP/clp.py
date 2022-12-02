@@ -191,7 +191,7 @@ def main():
             clean, bd = eval(net_clp, test_dl, opt, identity_grid=identity_grid, noise_grid=noise_grid)
         else:
             clean, bd = eval(net_clp, test_dl, opt)
-        outs.write("%d %0.4f %0.4f\n" % (index, clean, bd))
+        outs.write("%0.4f %0.4f\n" % (clean, bd))
 
 
 if __name__ == "__main__":
