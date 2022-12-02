@@ -166,8 +166,8 @@ def strip(opt, mode="clean"):
     else:
         raise Exception("model not in state_dict, please check the model key in checkpoint")
     if opt.attack == "WaNet" and mode != "clean":
-        identity_grid = state_dict["identity_grid"]
-        noise_grid = state_dict["noise_grid"]
+        identity_grid = state_dict["identity_grid"].to(opt.device)
+        noise_grid = state_dict["noise_grid"].to(opt.device)
     netC.requires_grad_(False)
     netC.eval()
     netC.to(opt.device)
@@ -265,7 +265,7 @@ def main():
     result_path = os.path.join(result_dir, opt.attack_mode)
     if not os.path.exists(result_path):
         os.makedirs(result_path)
-    result_path = os.path.join("{}_{}_output.txt".format(opt.dataset, opt.attack_mode))
+    result_path = os.path.join(result_path, "{}_{}_output.txt".format(opt.dataset, opt.attack_mode))
     print ('result_path', result_path)
 
     with open(result_path, "w+") as f:
