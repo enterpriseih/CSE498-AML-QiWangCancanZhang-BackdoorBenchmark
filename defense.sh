@@ -31,5 +31,4 @@ then
   #then
   #  python -u fine-pruning-mnist.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device
   cd $cur_dir
-  fi
 fi
