@@ -25,14 +25,15 @@ channel-Lipschitzness-based-pruning 2022
 
 ## Current Progress
 Attack:
-BadNet ()
-WaNet
-BppAttack
+BadNet 2017
+WaNet 2021
+BppAttack 2022
+Blended 2017
 
 Defense:
 neural_cleanse (For all, do not need bad inputs)
 STRIP (For BadNet, WaNet now)
-FINE_PRUNING (PLAN: Friday)
+FINE_PRUNING (For BadNet, WaNet now)
 CLP (PLAN: Friday)
 
 
@@ -79,7 +80,7 @@ nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine
 neural_cleanse
 modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
 
-STRIP
+STRIP / Fine_Pruning
 STRIP.py create_backdoor function, need to add methods generating bad inputs for different methods
 
 
