@@ -14,28 +14,36 @@ from utils.utils import progress_bar
 from classifier_models import PreActResNet18
 
 
-def create_targets_bd(targets, opt):
-    if opt.attack_mode == "all2one":
-        bd_targets = torch.ones_like(targets) * opt.target_label
-    elif opt.attack_mode == "all2all":
-        bd_targets = torch.tensor([(label + 1) % opt.num_classes for label in targets])
-    else:
-        raise Exception("{} attack mode is not implemented".format(opt.attack_mode))
-    return bd_targets.to(opt.device)
+def create_backdoor(inputs, opt, **args):
+    if opt.attack == 'WaNet':
+        identity_grid = args['identity_grid']
+        noise_grid = args['noise_grid']
+        bs = inputs.shape[0]
+        grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
+        grid_temps = torch.clamp(grid_temps, -1, 1)
+        bd_inputs = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
+    elif opt.attack == 'BadNet':
+        bd_inputs = inputs
+        for i in range(1, 4):
+            for j in range(1, 4):
+                bd_inputs[:, :, i, j] = 255
+    elif opt.attack == 'BppAttack':
+        bd_inputs = []
+        # need to add in the following
+
+    return bd_inputs
 
 
-def create_bd(netG, netM, inputs, targets, opt):
-    bd_targets = create_targets_bd(targets, opt)
-    patterns = netG(inputs)
-    patterns = netG.normalize_pattern(patterns)
 
-    masks_output = netM.threshold(netM(inputs))
-    bd_inputs = inputs + (patterns - inputs) * masks_output
-    return bd_inputs, bd_targets
-
-
-def eval(netC, identity_grid, noise_grid, test_dl, opt):
+def eval(netC, test_dl, opt, **args):
     print(" Eval:")
+    if opt.attack == "WaNet":
+        identity_grid = args["identity_grid"]
+        noise_grid = args["noise_grid"]
+    else:
+        identity_grid = None
+        noise_grid = None
+
     acc_clean = 0.0
     acc_bd = 0.0
     total_sample = 0
@@ -54,10 +62,11 @@ def eval(netC, identity_grid, noise_grid, test_dl, opt):
         acc_clean = total_correct_clean * 100.0 / total_sample
 
         # Evaluating backdoor
-        grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
-        grid_temps = torch.clamp(grid_temps, -1, 1)
+        if opt.attack == 'WaNet':
+            inputs_bd = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
+        else:
+            inputs_bd = create_backdoor(inputs, opt)
 
-        inputs_bd = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
         targets_bd = torch.ones_like(targets) * opt.target_label
         preds_bd = netC(inputs_bd)
         correct_bd = torch.sum(torch.argmax(preds_bd, 1) == targets_bd)
@@ -96,20 +105,29 @@ def main():
     else:
         raise Exception("Invalid dataset")
 
-    mode = opt.attack_mode
     opt.ckpt_folder = os.path.join(opt.checkpoints, opt.dataset)
-    opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, mode))
-    opt.log_dir = os.path.join(opt.ckpt_folder, "log_dir")
+    print('ckpt_folder', opt.ckpt_folder)
+    if os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}_morph.pth.tar".format(opt.dataset, opt.attack_mode))
+    elif os.path.exists(os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode))):
+        opt.ckpt_path = os.path.join(opt.ckpt_folder, "{}_{}.pth.tar".format(opt.dataset, opt.attack_mode))
+    else:
+        raise Exception("checkpoint path not right, please check")
 
     state_dict = torch.load(opt.ckpt_path)
-    print("load C")
-    netC.load_state_dict(state_dict["netC"])
-    netC.to(opt.device)
-    netC.eval()
+    if "netC" in state_dict:
+        netC.load_state_dict(state_dict["netC"])
+    elif "model" in state_dict:
+        netC.load_state_dict(state_dict["model"])
+    else:
+        raise Exception("model not in state_dict, please check the model key in checkpoint")
+    if opt.attack == "WaNet":
+        identity_grid = state_dict["identity_grid"]
+        noise_grid = state_dict["noise_grid"]
     netC.requires_grad_(False)
+    netC.eval()
+    netC.to(opt.device)
 
-    identity_grid = state_dict["identity_grid"]
-    noise_grid = state_dict["noise_grid"]
     # Prepare dataloader
     test_dl = get_dataloader(opt, train=False)
 
@@ -138,8 +156,17 @@ def main():
     # Pruning times - no-tuning after pruning a channel!!!
     acc_clean = []
     acc_bd = []
-    opt.outfile = "{}_results.txt".format(opt.dataset)
-    with open(opt.outfile, "w") as outs:
+
+    result_dir = opt.results
+    if not os.path.exists(result_dir):
+        os.makedirs(result_dir)
+    result_path = os.path.join(result_dir, opt.attack_mode)
+    if not os.path.exists(result_path):
+        os.makedirs(result_path)
+    result_path = os.path.join(result_path, "{}_{}_output.txt".format(opt.dataset, opt.attack_mode))
+    print ('result_path', result_path)
+
+    with open(result_path, "w") as outs:
         for index in range(pruning_mask.shape[0]):
             net_pruned = copy.deepcopy(netC)
             num_pruned = index
@@ -164,7 +191,10 @@ def main():
                 else:
                     continue
             net_pruned.to(opt.device)
-            clean, bd = eval(net_pruned, identity_grid, noise_grid, test_dl, opt)
+            if opt.attack == "WaNet":
+                clean, bd = eval(net_pruned, test_dl, opt, identity_grid=identity_grid, noise_grid=noise_grid)
+            else:
+                clean, bd = eval(net_pruned, test_dl, opt)
             outs.write("%d %0.4f %0.4f\n" % (index, clean, bd))
 
 

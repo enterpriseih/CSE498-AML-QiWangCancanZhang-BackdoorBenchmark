@@ -9,7 +9,9 @@ def get_arguments():
     parser.add_argument("--temps", type=str, default="./temps")
     parser.add_argument("--device", type=str, default="cuda")
 
+
     parser.add_argument("--dataset", type=str, default="celeba")
+    parser.add_argument("--attack", type=str, default="wanet")
     parser.add_argument("--input_height", type=int, default=None)
     parser.add_argument("--input_width", type=int, default=None)
     parser.add_argument("--input_channel", type=int, default=None)
