@@ -27,4 +27,8 @@ def get_arguments():
     parser.add_argument("--s", type=float, default=0.5)
     parser.add_argument("--grid_rescale", type=float, default=1)
 
+    # for bppattack
+    parser.add_argument("--squeeze_num", type=int, default=32)
+    parser.add_argument("--dithering", type=bool, default=False)
+
     return parser

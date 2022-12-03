@@ -30,6 +30,10 @@ def get_arguments():
     # for clp
     parser.add_argument("--u", type=float, default=3)
 
+    # for bppattack
+    parser.add_argument("--squeeze_num", type=int, default=32)
+    parser.add_argument("--dithering", type=bool, default=False)
+
 
 
     return parser

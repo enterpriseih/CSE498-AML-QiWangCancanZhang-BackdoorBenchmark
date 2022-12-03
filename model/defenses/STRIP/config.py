@@ -28,4 +28,9 @@ def get_argument():
         "--grid-rescale", type=float, default=1
     )  # scale grid values to avoid going out of [-1, 1]. For example, grid-rescale = 0.98
 
+
+    # for bppattack
+    parser.add_argument("--squeeze_num", type=int, default=32)
+    parser.add_argument("--dithering", type=bool, default=False)
+
     return parser
