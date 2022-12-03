@@ -63,28 +63,57 @@ nohup sh train.sh BadNet mnist  'cuda:3' 50 &> logs/train_badnet &
 ## How to Defense
 ### neural_cleanse
 
-nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_badnet_nc &
+nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_badnet_nc_cifar10 &
 
-nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_wanet_nc &
+nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_wanet_nc_cifar10 &
 
-nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_bppattack_nc &
+nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_bppattack_nc_cifar10 &
+
+nohup sh defense.sh BadNet neural_cleanse mnist 'cuda:3' 20 &> logs/defense_badnet_nc_mnist &
+
+nohup sh defense.sh WaNet neural_cleanse mnist 'cuda:3' 20 &> logs/defense_wanet_nc_mnist &
+
+nohup sh defense.sh BppAttack neural_cleanse mnist 'cuda:3' 20 &> logs/defense_bppattack_nc_mnist &
+
 
 ### STRIP
-nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> logs/defense_badnet_strip &
+nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> logs/defense_badnet_strip_cifar10 &
 
-nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> logs/defense_wanet_strip &
+nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> logs/defense_wanet_strip_cifar10 &
 
-nohup sh defense2.sh BppAttack STRIP cifar10 'cuda:0' 20 &> logs/defense_bppattack_strip &
+nohup sh defense2.sh BppAttack STRIP cifar10 'cuda:0' 20 &> logs/defense_bppattack_strip_cifar10 &
+
+nohup sh defense2.sh BadNet STRIP mnist 'cuda:3' 20 &> logs/defense_badnet_strip_mnist &
+
+nohup sh defense2.sh WaNet STRIP mnist 'cuda:3' 20 &> logs/defense_wanet_strip_mnist &
+
+nohup sh defense2.sh BppAttack STRIP mnist 'cuda:3' 20 &> logs/defense_bppattack_strip_mnist &
 
 ### fine_pruning
-nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> logs/defense_badnet_fine_pruning &
+nohup sh defense2.sh BadNet fine_pruning cifar10 'cuda:3' 20 &> logs/defense_badnet_fine_pruning_cifar10 &
 
-nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> logs/defense_badnet_fine_pruning_mnist &
+nohup sh defense2.sh WaNet fine_pruning cifar10 'cuda:3' 20 &> logs/defense_wanet_fine_pruning_cifar10 &
+
+nohup sh defense2.sh BppAttack fine_pruning cifar10 'cuda:3' 20 &> logs/defense_bppattack_fine_pruning_cifar10 &
+
+nohup sh defense2.sh BadNet fine_pruning mnist 'cuda:0' 20 &> logs/defense_badnet_fine_pruning_mnist &
+
+nohup sh defense2.sh WaNet fine_pruning mnist 'cuda:2' 20 &> logs/defense_wanet_fine_pruning_mnist &
+
+nohup sh defense2.sh BppAttack fine_pruning mnist 'cuda:2' 20 &> logs/defense_bppattack_fine_pruning_mnist &
+
 
 ### CLP
+nohup sh defense.sh BadNet CLP cifar10 'cuda:0' 20 &> logs/defense_badnet_clp_cifar10 &
+
+nohup sh defense2.sh WaNet CLP cifar10 'cuda:2' 20 &> logs/defense_wanet_clp_cifar10 &
+
+nohup sh defense2.sh BppAttack CLP cifar10 'cuda:2' 20 &> logs/defense_bppattack_clp_cifar10 &
+
+
 nohup sh defense.sh BadNet CLP mnist 'cuda:0' 20 &> logs/defense_badnet_clp_mnist &
 
-nohup sh defense.sh BadNet CLP cifar10 'cuda:0' 20 &> logs/defense_badnet_clp &
+
 
 
 
