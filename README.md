@@ -61,6 +61,7 @@ nohup sh train.sh BadNet mnist  'cuda:3' 50 &> logs/train_badnet &
 
 
 ## How to Defense
+### neural_cleanse
 
 nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_badnet_nc &
 
@@ -68,14 +69,19 @@ nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_wan
 
 nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_bppattack_nc &
 
+### STRIP
 nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> logs/defense_badnet_strip &
 
 nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> logs/defense_wanet_strip &
 
+nohup sh defense2.sh BppAttack STRIP cifar10 'cuda:0' 20 &> logs/defense_bppattack_strip &
+
+### fine_pruning
 nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> logs/defense_badnet_fine_pruning &
 
 nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> logs/defense_badnet_fine_pruning_mnist &
 
+### CLP
 nohup sh defense.sh BadNet CLP mnist 'cuda:0' 20 &> logs/defense_badnet_clp_mnist &
 
 nohup sh defense.sh BadNet CLP cifar10 'cuda:0' 20 &> logs/defense_badnet_clp &
