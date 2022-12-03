@@ -47,10 +47,10 @@ def get_model(opt):
             SENet18().to(opt.device)
 
     # Optimizer
-    optimizer = torch.optim.SGD(model.parameters(), opt.lr, momentum=0.9, weight_decay=5e-4)
+    optimizer = torch.optim.SGD(model.parameters(), opt.lr_C, momentum=0.9, weight_decay=5e-4)
 
     # Scheduler
-    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, opt.scheduler_milestones, opt.scheduler_lambda)
+    scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, opt.schedulerC_milestones, opt.schedulerC_lambda)
 
     return model, optimizer, scheduler
 
