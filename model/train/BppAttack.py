@@ -11,7 +11,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 import torchvision
-from classifier_models import PreActResNet18, ResNet18, DenseNet121, EfficientNetB0,MobileNetV2,VGG16,ResNeXt29_2x64d,SENet18
+from classifier_models import PreActResNet18, ResNet18
 from networks.models import Denormalizer, NetC_MNIST, Normalizer
 from torch import nn
 from torch.utils.tensorboard import SummaryWriter
