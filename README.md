@@ -28,13 +28,13 @@ Attack:
 BadNet 2017
 WaNet 2021
 BppAttack 2022
-Blended 2017
+Blended 2017 (Sat)
 
 Defense:
 neural_cleanse (For all, do not need bad inputs)
-STRIP (For BadNet, WaNet now)
-FINE_PRUNING (For BadNet, WaNet now)
-CLP (PLAN: Friday)
+STRIP (For BadNet, WaNet)
+FINE_PRUNING (For BadNet, WaNet)
+CLP (For BadNet, WaNet)
 
 
 
@@ -43,38 +43,43 @@ CLP (PLAN: Friday)
 
 
 ## How to Attack
-nohup sh train.sh Clean cifar10 'cuda:0' 50 &> train_clean &
+nohup sh train.sh Clean cifar10 'cuda:0' 50 &> logs/train_clean &
 
-nohup sh train.sh BppAttack cifar10 'cuda:1' 50 &> train_bppattack &
+nohup sh train.sh BppAttack cifar10 'cuda:1' 50 &> logs/train_bppattack &
 
-nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> train_wanet &
+nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> logs/train_wanet &
 
-nohup sh train.sh BadNet cifar10  'cuda:3' 50 &> train_badnet &
+nohup sh train.sh BadNet cifar10  'cuda:3' 50 &> logs/train_badnet &
 
-nohup sh train.sh Clean mnist 'cuda:0' 50 &> train_clean &
+nohup sh train.sh Clean mnist 'cuda:0' 50 &> logs/train_clean &
 
-nohup sh train.sh BppAttack mnist 'cuda:1' 50 &> train_bppattack &
+nohup sh train.sh BppAttack mnist 'cuda:1' 50 &> logs/train_bppattack &
 
-nohup sh train.sh WaNet mnist 'cuda:2' 50 &> train_wanet &
+nohup sh train.sh WaNet mnist 'cuda:2' 50 &> logs/train_wanet &
 
-nohup sh train.sh BadNet mnist  'cuda:3' 50 &> train_badnet &
+nohup sh train.sh BadNet mnist  'cuda:3' 50 &> logs/train_badnet &
 
 
 ## How to Defense
 
-nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> defense_badnet_nc &
+nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_badnet_nc &
 
-nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> defense_wanet_nc &
+nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_wanet_nc &
 
-nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> defense_bppattack_nc &
+nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_bppattack_nc &
 
-nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> defense_badnet_strip &
+nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> logs/defense_badnet_strip &
 
-nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> defense_wanet_strip &
+nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> logs/defense_wanet_strip &
 
-nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> defense_badnet_fine_pruning &
+nohup sh defense.sh BadNet fine_pruning cifar10 'cuda:0' 20 &> logs/defense_badnet_fine_pruning &
 
-nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> defense_badnet_fine_pruning_mnist &
+nohup sh defense.sh BadNet fine_pruning mnist 'cuda:0' 20 &> logs/defense_badnet_fine_pruning_mnist &
+
+nohup sh defense.sh BadNet CLP mnist 'cuda:0' 20 &> logs/defense_badnet_clp_mnist &
+
+nohup sh defense.sh BadNet CLP cifar10 'cuda:0' 20 &> logs/defense_badnet_clp &
+
 
 
 
@@ -97,7 +102,7 @@ STRIP.py create_backdoor function, need to add methods generating bad inputs for
 
 
 
-
+for defenses, I modified utils.py file, if we want to combine attack and defense together, then we need to modify it too...
 
 
 
