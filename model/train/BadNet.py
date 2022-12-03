@@ -3,6 +3,8 @@ import os
 import shutil
 from time import time
 
+import sys
+sys.path.append('model/')
 import config
 import numpy as np
 import torch
@@ -63,10 +65,22 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
         inputs, targets = inputs.to(opt.device), targets.to(opt.device)
         bs = inputs.shape[0]
 
+        # Create backdoor data for badnet
+        num_bd = int(bs * rate_bd)
+        inputs_bd = inputs[:num_bd] 
+        for i in range(1,4):
+            for j in range(1,4):
+                inputs_bd[:,:,i,j] = 255
 
-        total_inputs = inputs
+        if opt.attack_mode == "all2one":
+            targets_bd = torch.ones_like(targets[:num_bd]) * opt.target_label
+        if opt.attack_mode == "all2all":
+            targets_bd = torch.remainder(targets[:num_bd] + 1, opt.num_classes)
+
+
+        total_inputs = torch.cat([inputs_bd, inputs[num_bd:]], dim=0)
         total_inputs = transforms(total_inputs)
-        total_targets = targets
+        total_targets = torch.cat([targets_bd, targets[num_bd:]], dim=0)
         start = time()
         total_preds = netC(total_inputs)
         total_time += time() - start
@@ -81,25 +95,47 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
         total_sample += bs
         total_loss_ce += loss_ce.detach()
 
-
+        total_clean += bs - num_bd
+        total_bd += num_bd
         total_clean_correct += torch.sum(
-            torch.argmax(total_preds, dim=1) == total_targets
+            torch.argmax(total_preds[num_bd:], dim=1) == total_targets[num_bd :]
         )
+        total_bd_correct += torch.sum(torch.argmax(total_preds[:num_bd], dim=1) == targets_bd)
+     
 
-        avg_acc_clean = total_clean_correct * 100.0 / total_sample
+        avg_acc_clean = total_clean_correct * 100.0 / total_clean
+        avg_acc_bd = total_bd_correct * 100.0 / total_bd
+
         avg_loss_ce = total_loss_ce / total_sample
 
+        
         progress_bar(
                 batch_idx,
                 len(train_dl),
-                "CE Loss: {:.4f} | Clean Acc: {:.4f} ".format(avg_loss_ce, avg_acc_clean),
+                "CE Loss: {:.4f} | Clean Acc: {:.4f} | Bd Acc: {:.4f} ".format(avg_loss_ce, avg_acc_clean, avg_acc_bd),
             )
+
+        # Save image for debugging
+        if not batch_idx % 50:
+            if not os.path.exists(opt.temps):
+                os.makedirs(opt.temps)
+            path = os.path.join(opt.temps, "backdoor_image.png")
+            torchvision.utils.save_image(inputs_bd, path, normalize=True)
+
+        # Image for tensorboard
+        if batch_idx == len(train_dl) - 2:
+            residual = inputs_bd - inputs[:num_bd]
+            batch_img = torch.cat([inputs[:num_bd], inputs_bd, total_inputs[:num_bd], residual], dim=2)
+            batch_img = denormalizer(batch_img)
+            batch_img = F.upsample(batch_img, scale_factor=(4, 4))
+            grid = torchvision.utils.make_grid(batch_img, normalize=True)
 
     # for tensorboard
     if not epoch % 1:
         tf_writer.add_scalars(
-            "Clean Accuracy", {"Clean": avg_acc_clean}, epoch
+            "Clean Accuracy", {"Clean": avg_acc_clean, "Bd": avg_acc_bd}, epoch
         )
+        tf_writer.add_image("Images", grid, global_step=epoch)
 
     schedulerC.step()
 
@@ -110,6 +146,7 @@ def eval(
     schedulerC,
     test_dl,
     best_clean_acc,
+    best_bd_acc,
     tf_writer,
     epoch,
     opt,
@@ -119,6 +156,7 @@ def eval(
 
     total_sample = 0
     total_clean_correct = 0
+    total_bd_correct = 0
     total_ae_loss = 0
 
     criterion_BCE = torch.nn.BCELoss()
@@ -132,37 +170,56 @@ def eval(
             # Evaluate Clean
             preds_clean = netC(inputs)
             total_clean_correct += torch.sum(torch.argmax(preds_clean, 1) == targets)
-            acc_clean = total_clean_correct * 100.0 / total_sample
 
-            info_string = "Clean Acc: {:.4f} - Best: {:.4f}".format(
-                    acc_clean, best_clean_acc
+            # Evaluate Backdoor
+            inputs_bd = inputs
+            for i in range(1,4):
+                for j in range(1,4):
+                    inputs_bd[:,:,i,j] = 255
+
+            if opt.attack_mode == "all2one":
+                targets_bd = torch.ones_like(targets) * opt.target_label
+            if opt.attack_mode == "all2all":
+                targets_bd = torch.remainder(targets + 1, opt.num_classes)
+            preds_bd = netC(inputs_bd)
+            total_bd_correct += torch.sum(torch.argmax(preds_bd, 1) == targets_bd)
+
+            acc_clean = total_clean_correct * 100.0 / total_sample
+            acc_bd = total_bd_correct * 100.0 / total_sample
+
+            
+            info_string = "Clean Acc: {:.4f} - Best: {:.4f} | Bd Acc: {:.4f} - Best: {:.4f}".format(
+                    acc_clean, best_clean_acc, acc_bd, best_bd_acc
                 )
             progress_bar(batch_idx, len(test_dl), info_string)
 
     # tensorboard
     if not epoch % 1:
-        tf_writer.add_scalars("Test Accuracy", {"Clean": acc_clean}, epoch)
+        tf_writer.add_scalars("Test Accuracy", {"Clean": acc_clean, "Bd": acc_bd}, epoch)
 
     # Save checkpoint
-    if acc_clean > best_clean_acc or (acc_clean > best_clean_acc - 0.1):
+    if acc_clean > best_clean_acc or (acc_clean > best_clean_acc - 0.1 and acc_bd > best_bd_acc):
         print(" Saving...")
         best_clean_acc = acc_clean
+        best_bd_acc = acc_bd
         state_dict = {
             "netC": netC.state_dict(),
             "schedulerC": schedulerC.state_dict(),
             "optimizerC": optimizerC.state_dict(),
             "best_clean_acc": best_clean_acc,
-            "epoch_current": epoch
+            "best_bd_acc": best_bd_acc,
+            "epoch_current": epoch,
         }
         torch.save(state_dict, opt.ckpt_path)
         with open(os.path.join(opt.ckpt_folder, "results.txt"), "w+") as f:
             results_dict = {
                 "epoch": epoch,
                 "clean_acc": best_clean_acc.item(),
+                "bd_acc": best_bd_acc.item(),
             }
             json.dump(results_dict, f, indent=2)
 
-    return best_clean_acc
+    return best_clean_acc, best_bd_acc
 
 
 def main():
@@ -219,6 +276,7 @@ def main():
             optimizerC.load_state_dict(state_dict["optimizerC"])
             schedulerC.load_state_dict(state_dict["schedulerC"])
             best_clean_acc = state_dict["best_clean_acc"]
+            best_bd_acc = state_dict["best_bd_acc"]
             epoch_current = state_dict["epoch_current"]
             tf_writer = SummaryWriter(log_dir=opt.log_dir)
         else:
@@ -227,6 +285,7 @@ def main():
     else:
         print("Train from scratch!!!")
         best_clean_acc = 0.0
+        best_bd_acc = 0.0
         epoch_current = 0
 
         shutil.rmtree(opt.ckpt_folder, ignore_errors=True)
@@ -238,12 +297,13 @@ def main():
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
         train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt)
-        best_clean_acc= eval(
+        best_clean_acc, best_bd_acc= eval(
             netC,
             optimizerC,
             schedulerC,
             test_dl,
             best_clean_acc,
+            best_bd_acc,
             tf_writer,
             epoch,
             opt,

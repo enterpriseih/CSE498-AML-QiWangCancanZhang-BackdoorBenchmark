@@ -3,6 +3,9 @@ import os
 import shutil
 from time import time
 
+import sys
+sys.path.append('model/')
+
 import config
 import numpy as np
 import torch
