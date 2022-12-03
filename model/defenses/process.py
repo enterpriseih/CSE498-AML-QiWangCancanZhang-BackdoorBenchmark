@@ -1,5 +1,8 @@
 import torch
 import torch.nn.functional as F
+import numpy as np
+from numba import jit
+from numba.types import float64, int64
 
 def create_backdoor(inputs, opt, **args):
     if opt.attack == 'WaNet':
