@@ -10,7 +10,9 @@ from config import get_argument
 
 import sys
 
-sys.path.insert(0, "../..")
+sys.path.append("../..")
+sys.path.append("..")
+from process import create_backdoor
 from classifier_models import PreActResNet18, ResNet18
 from utils.dataloader import get_dataloader, get_dataset
 from utils.utils import progress_bar
@@ -111,26 +113,6 @@ class STRIP:
 
     def __call__(self, background, dataset, classifier):
         return self._get_entropy(background, dataset, classifier)
-
-
-def create_backdoor(inputs, opt, **args):
-    if opt.attack == 'WaNet':
-        identity_grid = args['identity_grid']
-        noise_grid = args['noise_grid']
-        bs = inputs.shape[0]
-        grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
-        grid_temps = torch.clamp(grid_temps, -1, 1)
-        bd_inputs = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
-    elif opt.attack == 'BadNet':
-        bd_inputs = inputs
-        for i in range(1, 4):
-            for j in range(1, 4):
-                bd_inputs[:, :, i, j] = 255
-    elif opt.attack == 'BppAttack':
-        bd_inputs = []
-        # need to add in the following
-
-    return bd_inputs
 
 
 def strip(opt, mode="clean"):

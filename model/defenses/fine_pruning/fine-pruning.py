@@ -7,33 +7,13 @@ import numpy as np
 import torch.nn.functional as F
 
 import sys
-
-sys.path.insert(0, "../..")
+sys.path.append("../..")
+sys.path.append("..")
+from process import create_backdoor
 from utils.dataloader import get_dataloader
 from utils.utils import progress_bar
 from classifier_models import PreActResNet18
 from networks.models import Normalizer, Denormalizer, NetC_MNIST
-
-def create_backdoor(inputs, opt, **args):
-    if opt.attack == 'WaNet':
-        identity_grid = args['identity_grid']
-        noise_grid = args['noise_grid']
-        bs = inputs.shape[0]
-        grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
-        grid_temps = torch.clamp(grid_temps, -1, 1)
-        bd_inputs = F.grid_sample(inputs, grid_temps.repeat(bs, 1, 1, 1), align_corners=True)
-    elif opt.attack == 'BadNet':
-        bd_inputs = inputs
-        for i in range(1, 4):
-            for j in range(1, 4):
-                bd_inputs[:, :, i, j] = 255
-    elif opt.attack == 'BppAttack':
-        bd_inputs = []
-        # need to add in the following
-
-    return bd_inputs
-
-
 
 def eval(netC, test_dl, opt, **args):
     print(" Eval:")
