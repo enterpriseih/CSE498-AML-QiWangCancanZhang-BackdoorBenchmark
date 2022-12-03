@@ -105,8 +105,8 @@ def main():
     else:
         raise Exception("model not in state_dict, please check the model key in checkpoint")
     if opt.attack == "WaNet":
-        identity_grid = state_dict["identity_grid"]
-        noise_grid = state_dict["noise_grid"]
+        identity_grid = state_dict["identity_grid"].to(opt.device)
+        noise_grid = state_dict["noise_grid"].to(opt.device)
     netC.requires_grad_(False)
     netC.eval()
     netC.to(opt.device)
