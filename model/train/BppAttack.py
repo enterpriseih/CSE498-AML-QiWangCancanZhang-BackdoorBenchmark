@@ -140,7 +140,7 @@ def floydDitherspeed(image,squeeze_num):
     
     
 
-def train(train_transform, model, optimizer, scheduler, train_dl, tf_writer, epoch, opt, residual_list_train):
+def train(model, optimizer, scheduler, train_dl, tf_writer, epoch, opt, residual_list_train):
     print(" Train:")
     squeeze_num = opt.squeeze_num
     
@@ -316,7 +316,6 @@ def train(train_transform, model, optimizer, scheduler, train_dl, tf_writer, epo
 
 
 def eval(
-    test_transform,
     model,
     optimizer,
     scheduler,
@@ -465,8 +464,8 @@ def main():
         raise Exception("Invalid Dataset")
 
     # Dataset
-    train_dl, train_transform = get_dataloader(opt, True)
-    test_dl, test_transform = get_dataloader(opt, False)
+    train_dl = get_dataloader(opt, True)
+    test_dl = get_dataloader(opt, False)
 
     # prepare model
     model, optimizer, scheduler = get_model(opt)
@@ -544,9 +543,8 @@ def main():
 
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
-        train(train_transform,model, optimizer, scheduler, train_dl, tf_writer, epoch, opt, residual_list_train)
+        train(model, optimizer, scheduler, train_dl, tf_writer, epoch, opt, residual_list_train)
         best_clean_acc, best_bd_acc, best_cross_acc = eval(
-            test_transform,
             model,
             optimizer,
             scheduler,
