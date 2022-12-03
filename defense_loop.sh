@@ -13,11 +13,11 @@ for dataset in ${datasetArray[@]}; do
   for attck in ${attackArray[@]}; do
     for defense in ${defenseArray[@]}; do
       echo "dataset:$dataset attack:$attack defense:$defense"
-      log_file=logs/defense_$attack_$defense_$dataset
+      log_file=logs_defenses/defense_$attack_$defense_$dataset
       if [ -f "$log_file"]; then
         echo "log file exist"
       else
-        nohup sh defense2.sh $attack $defense $device $epoch &> logs/defense_$attack_$defense_$dataset &
+        nohup sh defense2.sh $attack $defense $device $epoch &> $log_file &
       fi
     done
   done
