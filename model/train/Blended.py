@@ -40,6 +40,13 @@ def get_model(opt):
 
     return netC, optimizerC, schedulerC
 
+def generate_blended_trigger(opt):
+    trigger = Image.open(opt.blended_trigger_path).convert('RGB')
+    trigger = trigger.resize((opt.input_height, opt.input_width))
+    trigger = np.asarray(trigger) if opt.input_channel == 3 else np.asarray(trigger)[:, :, 0]
+    trigger = torch.from_numpy(trigger).to(opt.device)
+    trigger = torch.unsqueeze(torch.moveaxis(trigger, -1, 0), 0)
+    return trigger
 
 def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
     print(" Train:")
@@ -59,13 +66,8 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
     transforms = PostTensorTransform(opt).to(opt.device)
     total_time = 0
 
+    trigger = generate_blended_trigger(opt)
 
-    trigger = Image.open(opt.blended_trigger_path).convert('RGB')
-    trigger = trigger.resize((opt.input_height,opt.input_width))
-    trigger = np.asarray(trigger) if opt.input_channel == 3 else np.asarray(trigger)[:,:,0]
-    trigger = torch.from_numpy(trigger).to(opt.device)
-    trigger = torch.unsqueeze(torch.moveaxis(trigger,-1,0),0)
-    print (trigger.size())
     for batch_idx, (inputs, targets) in enumerate(train_dl):
         optimizerC.zero_grad()
 
@@ -75,7 +77,6 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
         # Create backdoor data for blended
         num_bd = int(bs * rate_bd)
         inputs_bd = inputs[:num_bd]
-        print (inputs_bd.size())
         inputs_bd = (1-opt.blended_rate)*inputs_bd + opt.blended_rate*trigger
 
         if opt.attack_mode == "all2one":
@@ -167,6 +168,7 @@ def eval(
 
     criterion_BCE = torch.nn.BCELoss()
 
+    trigger = generate_blended_trigger(opt)
     for batch_idx, (inputs, targets) in enumerate(test_dl):
         with torch.no_grad():
             inputs, targets = inputs.to(opt.device), targets.to(opt.device)
@@ -179,6 +181,8 @@ def eval(
 
             # Evaluate Backdoor
             inputs_bd = inputs
+            inputs_bd = (1 - opt.blended_rate) * inputs_bd + opt.blended_rate * trigger
+
             for i in range(1,4):
                 for j in range(1,4):
                     inputs_bd[:,:,i,j] = 255
