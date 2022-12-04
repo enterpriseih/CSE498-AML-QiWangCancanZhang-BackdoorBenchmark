@@ -44,4 +44,14 @@ then
     python -u clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   fi
   cd $cur_dir
+elif [ "$defense" = 'ShrinkPad' ]
+then
+  cd model/defenses/ShrinkPad
+  if [ "$attack" = 'ISSBA' ]; then
+    python3.7 ShrinkPad.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
+  else
+    python -u ShrinkPad.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
+  fi
+  cd $cur_dir
+
 fi
