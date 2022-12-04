@@ -4,12 +4,14 @@ import numpy as np
 from numba import jit
 from numba.types import float64, int64
 from PIL import Image
-try:
-    import bchlib
-    import tensorflow as tf
-    from tensorflow.python.saved_model import tag_constants
-    from tensorflow.python.saved_model import signature_constants
+import bchlib
+import tensorflow as tf
+from tensorflow.python.saved_model import tag_constants
+from tensorflow.python.saved_model import signature_constants
+import sys
 
+sys.path.append("../..")
+sys.path.append("../../..")
 
 def generate_blended_trigger(opt):
     trigger = Image.open(opt.blended_trigger_path).convert('RGB')

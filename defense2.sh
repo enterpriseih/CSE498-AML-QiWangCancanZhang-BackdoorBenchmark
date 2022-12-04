@@ -39,7 +39,7 @@ elif [ "$defense" = 'CLP' ]
 then
   cd model/defenses/CLP
   if [ "$attack" = 'ISSBA' ]; then
-    python3.7 clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device$device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
+    python3.7 clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   else
     python -u clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   fi

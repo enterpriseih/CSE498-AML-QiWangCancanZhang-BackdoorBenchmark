@@ -1,11 +1,8 @@
 import torch
 import os
-import torchvision
 import numpy as np
 import cv2
 import torch.nn.functional as F
-from torchvision import transforms
-
 from config import get_argument
 
 import sys
@@ -13,6 +10,8 @@ import sys
 sys.path.append("../..")
 sys.path.append("..")
 from process import create_backdoor
+import torchvision
+from torchvision import transforms
 from classifier_models import PreActResNet18, ResNet18
 from utils.dataloader import get_dataloader, get_dataset
 from utils.utils import progress_bar
