@@ -1,5 +1,6 @@
 import argparse
 
+PREFIX = '/home/jupyter-caz322/lehigh_courses/DSCI_498/AMLproject/'
 
 def get_arguments():
     parser = argparse.ArgumentParser()
@@ -39,7 +40,7 @@ def get_arguments():
     parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
 
     # issba
-    parser.add_argument("--encorder_path", type=str, default='data/ISSBA_encoder_ckpt')
+    parser.add_argument("--encorder_path", type=str, default=PREFIX+'data/ISSBA_encoder_ckpt')
 
 
     return parser
