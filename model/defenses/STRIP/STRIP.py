@@ -69,9 +69,9 @@ class STRIP:
 
     def _get_denormalize(self, opt):
         if opt.dataset == "cifar10":
-            denormalizer = Denormalize(opt, [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261])
+            denormalizer = None if opt.attack == 'ISSBA' else Denormalize(opt, [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261])
         elif opt.dataset == "mnist":
-            denormalizer = Denormalize(opt, [0.5], [0.5])
+            denormalizer = None if opt.attack == 'ISSBA' else Denormalize(opt, [0.5], [0.5])
         elif opt.dataset == "gtsrb" or opt.dataset == "celeba":
             denormalizer = None
         else:
@@ -80,9 +80,9 @@ class STRIP:
 
     def _get_normalize(self, opt):
         if opt.dataset == "cifar10":
-            normalizer = Normalize(opt, [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261])
+            normalizer = None if opt.attack == 'ISSBA' else Normalize(opt, [0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261])
         elif opt.dataset == "mnist":
-            normalizer = Normalize(opt, [0.5], [0.5])
+            normalizer = None if opt.attack == 'ISSBA' else Normalize(opt, [0.5], [0.5])
         elif opt.dataset == "gtsrb" or opt.dataset == "celeba":
             normalizer = None
         else:
@@ -175,7 +175,6 @@ def strip(opt, mode="clean"):
             bd_inputs = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
         else:
             bd_inputs = create_backdoor(inputs, opt)
-
         bd_inputs = denormalizer(bd_inputs) * 255.0
         bd_inputs = bd_inputs.detach().cpu().numpy()
         bd_inputs = np.clip(bd_inputs, 0, 255).astype(np.uint8).transpose((0, 2, 3, 1))
