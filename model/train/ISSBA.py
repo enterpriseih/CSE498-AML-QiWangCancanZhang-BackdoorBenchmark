@@ -2,6 +2,10 @@ import json
 import os
 import shutil
 from time import time
+
+import sys
+sys.path.append('model/')
+
 import config
 import numpy as np
 import torch
@@ -162,7 +166,7 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt, **args)
         inputs_bd = inputs_bd.detach().cpu().numpy()
 
         for i in range(inputs_bd.shape[0]):
-            inputs_bd[i] = ISSBA_encoder(inputs_bd[i], args)
+            inputs_bd[i] = ISSBA_encoder(inputs_bd[i], **args)
 
         # np to tensor
         inputs_bd = torch.from_numpy(inputs_bd).to(opt.device)
@@ -274,7 +278,7 @@ def eval(
             inputs_bd = inputs_bd.detach().cpu().numpy()
 
             for i in range(inputs_bd.shape[0]):
-                inputs_bd[i] = ISSBA_encoder(inputs_bd[i],args)
+                inputs_bd[i] = ISSBA_encoder(inputs_bd[i], **args)
 
             # np to tensor
             inputs_bd = torch.from_numpy(inputs_bd).to(opt.device)
@@ -407,7 +411,7 @@ def main():
               'secret':secret}
     for epoch in range(epoch_current, opt.n_iters):
         print("Epoch {}:".format(epoch + 1))
-        train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt, params)
+        train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt, **params)
         best_clean_acc, best_bd_acc = eval(
             netC,
             optimizerC,
@@ -418,7 +422,7 @@ def main():
             tf_writer,
             epoch,
             opt,
-            params
+            **params
         )
 
 

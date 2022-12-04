@@ -45,9 +45,11 @@ def get_transform(opt, train=True, pretensor_transform=False):
 
     transforms_list.append(transforms.ToTensor())
     if opt.dataset == "cifar10":
-        transforms_list.append(transforms.Normalize([0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]))
+        if opt.attack != 'ISSBA':
+            transforms_list.append(transforms.Normalize([0.4914, 0.4822, 0.4465], [0.247, 0.243, 0.261]))
     elif opt.dataset == "mnist":
-        transforms_list.append(transforms.Normalize([0.5], [0.5]))
+        if opt.attack != 'ISSBA':
+            transforms_list.append(transforms.Normalize([0.5], [0.5]))
     elif opt.dataset == "gtsrb" or opt.dataset == "celeba":
         pass
     else:
@@ -144,15 +146,9 @@ def get_dataloader(opt, train=True, pretensor_transform=False):
     if opt.dataset == "gtsrb":
         dataset = GTSRB(opt, train, transform)
     elif opt.dataset == "mnist":
-        if opt.attack != 'ISSBA':
-            dataset = torchvision.datasets.MNIST(opt.data_root, train, transform, download=True)
-        else:
-            pass
+        dataset = torchvision.datasets.MNIST(opt.data_root, train, transform, download=True)
     elif opt.dataset == "cifar10":
-        if opt.attack != 'ISSBA':
-            dataset = torchvision.datasets.CIFAR10(opt.data_root, train, transform, download=True)
-        else:
-            pass
+        dataset = torchvision.datasets.CIFAR10(opt.data_root, train, transform, download=True)
     elif opt.dataset == "celeba":
         if train:
             split = "train"

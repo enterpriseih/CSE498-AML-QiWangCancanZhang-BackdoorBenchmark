@@ -11,6 +11,7 @@ def get_arguments():
     parser.add_argument("--continue_training", action="store_true")
 
     parser.add_argument("--dataset", type=str, default="cifar10")
+    parser.add_argument("--attack", type=str, default="BadNet")
     parser.add_argument("--attack_mode", type=str, default="all2one")
 
     parser.add_argument("--bs", type=int, default=128)
@@ -47,6 +48,6 @@ def get_arguments():
     parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
 
     # issba
-    parser.add_argument("--encorder_path", type=str, default='data/ISSBA_encoder_ckpt/saved_model.pb')
+    parser.add_argument("--encorder_path", type=str, default='data/ISSBA_encoder_ckpt/')
 
     return parser
