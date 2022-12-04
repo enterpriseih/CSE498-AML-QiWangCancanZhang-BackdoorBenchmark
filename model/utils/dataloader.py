@@ -144,9 +144,15 @@ def get_dataloader(opt, train=True, pretensor_transform=False):
     if opt.dataset == "gtsrb":
         dataset = GTSRB(opt, train, transform)
     elif opt.dataset == "mnist":
-        dataset = torchvision.datasets.MNIST(opt.data_root, train, transform, download=True)
+        if opt.attack != 'ISSBA':
+            dataset = torchvision.datasets.MNIST(opt.data_root, train, transform, download=True)
+        else:
+            pass
     elif opt.dataset == "cifar10":
-        dataset = torchvision.datasets.CIFAR10(opt.data_root, train, transform, download=True)
+        if opt.attack != 'ISSBA':
+            dataset = torchvision.datasets.CIFAR10(opt.data_root, train, transform, download=True)
+        else:
+            pass
     elif opt.dataset == "celeba":
         if train:
             split = "train"

@@ -1,10 +1,7 @@
 import torch
 import torch.nn.functional as F
-import torchvision
 from torch import nn
 from torch.nn import Module
-from torchvision import transforms
-
 from .blocks import *
 
 
