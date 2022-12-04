@@ -3,6 +3,15 @@ import torch.nn.functional as F
 import numpy as np
 from numba import jit
 from numba.types import float64, int64
+from PIL import Image
+
+def generate_blended_trigger(opt):
+    trigger = Image.open(opt.blended_trigger_path).convert('RGB')
+    trigger = trigger.resize((opt.input_height, opt.input_width))
+    trigger = np.asarray(trigger) if opt.input_channel == 3 else np.asarray(trigger)[:, :, 0]
+    trigger = torch.from_numpy(trigger).to(opt.device)
+    trigger = torch.unsqueeze(torch.moveaxis(trigger, -1, 0), 0)
+    return trigger
 
 def create_backdoor(inputs, opt, **args):
     if opt.attack == 'WaNet':
@@ -27,6 +36,9 @@ def create_backdoor(inputs, opt, **args):
         else:
             inputs_bd = torch.round(bd_inputs / 255.0 * (opt.squeeze_num - 1)) / (opt.squeeze_num - 1) * 255
         bd_inputs = np_4d_to_tensor(inputs_bd, opt)
+    elif opt.attack == 'Blended':
+        trigger = generate_blended_trigger(opt)
+        bd_inputs = (1 - opt.blended_rate) * inputs + opt.blended_rate * trigger
 
     return bd_inputs
 

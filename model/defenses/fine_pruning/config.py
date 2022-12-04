@@ -31,4 +31,8 @@ def get_arguments():
     parser.add_argument("--squeeze_num", type=int, default=32)
     parser.add_argument("--dithering", type=bool, default=False)
 
+    # blended
+    parser.add_argument("--blended_rate", type=int, default=0.2)
+    parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
+
     return parser

@@ -27,12 +27,16 @@ def get_arguments():
     parser.add_argument("--s", type=float, default=0.5)
     parser.add_argument("--grid_rescale", type=float, default=1)
 
-    # for clp
+    # clp
     parser.add_argument("--u", type=float, default=3)
 
-    # for bppattack
+    # bppattack
     parser.add_argument("--squeeze_num", type=int, default=32)
     parser.add_argument("--dithering", type=bool, default=False)
+
+    # blended
+    parser.add_argument("--blended_rate", type=int, default=0.2)
+    parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
 
 
 
