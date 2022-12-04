@@ -1,24 +1,22 @@
-#!/bin/sh
+#!/bin/bash
 
-device=$4
+device=$1
 epoch=20
 cur_dir=$PWD
 
-declare -a datasetArray=("cifar10" "mnist")
-declare -a attackArray=("BadNet" "WaNet" "BppAttack")
-declear -a defenseArray=("neural_cleanse" "STRIP" "fine_pruning" "CLP")
+defense_list="conf/defense_methods"
+attack_list="conf/attack_methods"
+dataset_list=(mnist)
 
-
-for dataset in ${datasetArray[@]}; do
-  for attck in ${attackArray[@]}; do
-    for defense in ${defenseArray[@]}; do
-      echo "dataset:$dataset attack:$attack defense:$defense"
-      log_file=logs_defenses/defense_$attack_$defense_$dataset
-      if [ -f "$log_file"]; then
-        echo "log file exist"
-      else
-        nohup sh defense2.sh $attack $defense $device $epoch &> $log_file &
-      fi
-    done
-  done
+for dataset in ${dataset_list[@]}; do
+    while IFS= read -r attack
+    do
+        while IFS= read -r defense
+        do
+            echo "dataset:$dataset attack:$attack defense:$defense"
+            log_file="logs_defenses/defense_${attack}_${defense}_${dataset}"
+            echo $log_file
+            nohup sh defense2.sh $attack $defense $dataset $device $epoch &> $log_file &
+        done < "$defense_list"
+    done < "$attack_list"
 done
