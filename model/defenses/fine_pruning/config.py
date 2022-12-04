@@ -36,5 +36,5 @@ def get_arguments():
     parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
 
     # issba
-    parser.add_argument("--encorder_path", type=str, default='data/ISSBA_encoder_ckpt/')
+    parser.add_argument("--encorder_path", type=str, default='data/ISSBA_encoder_ckpt')
     return parser
