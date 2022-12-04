@@ -62,7 +62,7 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
 
     trigger = Image.open(opt.blended_trigger_path)
     print (np.array(trigger).shape)
-    trigger = trigger.resize((64,64))
+    trigger = trigger.resize((opt.input_height,opt.input_width))
     trigger = torch.from_numpy(np.asarray(trigger)).to(opt.device)
 
     for batch_idx, (inputs, targets) in enumerate(train_dl):

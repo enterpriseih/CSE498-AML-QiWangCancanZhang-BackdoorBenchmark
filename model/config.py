@@ -42,4 +42,8 @@ def get_arguments():
     parser.add_argument("--save_freq", type=int, default=50)
     parser.add_argument("--set_arch", type=str, default=None)
 
+    # blended
+    parser.add_argument("--blended_rate", type=int, default=0.1)
+    parser.add_argument("--blended_trigger_path", type=int, default='./data/triggers/hello_kitty.png')
+
     return parser

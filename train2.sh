@@ -15,6 +15,9 @@ then
 elif [ "$attack" = "BadNet" ]
 then
     python model/train/$attack.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device --n_iters $n_iters --bs $batch_size
+elif [ "$attack" = "Blended" ]
+then
+    python model/train/$attack.py --dataset $dataset --attack_mode all2one --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device --n_iters $n_iters --bs $batch_size
 elif [ "$attack" = "Clean" ]
 then
     python model/train/$attack.py --dataset $dataset --data_root 'datasets/' --checkpoints "checkpoints/${attack}/" --device $device --n_iters $n_iters --bs $batch_size
