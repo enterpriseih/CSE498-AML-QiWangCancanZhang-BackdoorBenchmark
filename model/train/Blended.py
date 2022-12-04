@@ -60,11 +60,12 @@ def train(netC, optimizerC, schedulerC, train_dl, tf_writer, epoch, opt):
     total_time = 0
 
 
-    trigger = Image.open(opt.blended_trigger_path)
-    print (np.array(trigger).shape)
+    trigger = Image.open(opt.blended_trigger_path).convert('RGB')
     trigger = trigger.resize((opt.input_height,opt.input_width))
-    trigger = torch.from_numpy(np.asarray(trigger)).to(opt.device)
-
+    trigger = np.asarray(trigger) if opt.input_channel == 3 else np.asarray(trigger)[:,:,0]
+    trigger = torch.from_numpy(trigger).to(opt.device)
+    trigger = torch.unsqueeze(torch.moveaxis(trigger,-1,0),0)
+    print (trigger.size())
     for batch_idx, (inputs, targets) in enumerate(train_dl):
         optimizerC.zero_grad()
 

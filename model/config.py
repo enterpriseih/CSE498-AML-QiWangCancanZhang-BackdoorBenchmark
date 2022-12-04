@@ -44,6 +44,6 @@ def get_arguments():
 
     # blended
     parser.add_argument("--blended_rate", type=int, default=0.1)
-    parser.add_argument("--blended_trigger_path", type=int, default='./data/triggers/hello_kitty.png')
+    parser.add_argument("--blended_trigger_path", type=str, default='data/triggers/hello_kitty.png')
 
     return parser
