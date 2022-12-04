@@ -16,16 +16,16 @@ then
 elif [ "$defense" = 'STRIP' ]
 then
   cd model/defenses/STRIP
-  python -u STRIP.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --result "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device
+  python -u STRIP.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --result "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   cd $cur_dir
 elif [ "$defense" = 'fine_pruning' ]
 then
   cd model/defenses/fine_pruning
-  python -u fine-pruning.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device
+  python -u fine-pruning.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   cd $cur_dir
 elif [ "$defense" = 'CLP' ]
 then
   cd model/defenses/CLP
-  python -u clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device
+  python -u clp.py --dataset $dataset --attack $attack --attack_mode all2one --data_root "${cur_dir}/datasets/" --checkpoints "${cur_dir}/checkpoints/${attack}/" --results "${cur_dir}/checkpoints/${attack}/${dataset}/defense/${defense}" --device $device --blended_trigger_path "${cur_dir}/data/triggers/hello_kitty.png"
   cd $cur_dir
 fi
