@@ -56,16 +56,18 @@ def eval(netC, test_dl, opt, **args):
         total_sample += bs
 
         # Evaluating clean
-        preds_clean = netC(shrinkpad(inputs))
+        inputs_bd = torch.clone(inputs)
+        inputs = shrinkpad(inputs)
+        preds_clean = netC(inputs)
         correct_clean = torch.sum(torch.argmax(preds_clean, 1) == targets)
         total_correct_clean += correct_clean
         acc_clean = total_correct_clean * 100.0 / total_sample
 
         # Evaluating backdoor
         if opt.attack == 'WaNet':
-            inputs_bd = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
+            inputs_bd = create_backdoor(inputs_bd, opt, identity_grid=identity_grid, noise_grid=noise_grid)
         else:
-            inputs_bd = create_backdoor(inputs, opt)
+            inputs_bd = create_backdoor(inputs_bd, opt)
         inputs_bd = shrinkpad(inputs_bd)
         targets_bd = torch.ones_like(targets) * opt.target_label
         preds_bd = netC(inputs_bd)

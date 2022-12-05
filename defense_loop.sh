@@ -6,7 +6,7 @@ cur_dir=$PWD
 
 defense_list="conf/defense_methods"
 attack_list="conf/attack_methods"
-dataset_list=(mnist)
+dataset_list=(cifar10)
 
 for dataset in ${dataset_list[@]}; do
     while IFS= read -r attack
