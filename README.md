@@ -1,145 +1,31 @@
 # AMLproject
 
 
-mkdir data
-
 
 
 ## Attack
-BppAttack 2022
 
-WaNet 2021
-
-BadNet 2016
-
-1. train with dataset and save backdoored checkpoint
-2. evaluate and save performance (BA, ASR)
+BppAttack, WaNet, BadNet, ISSBA, Blended
 
 ## Defense
-channel-Lipschitzness-based-pruning 2022
 
-1. load backdoored checkpoint
-2. revise checkpoint and save defensed checkpoint
-3. evaluate and save performance (BA, ASR for defensed checkpoint)
-
-
-## Current Progress
-Attack:
-BadNet 2017
-WaNet 2021
-BppAttack 2022
-Blended 2017 (Sat)
-
-Defense:
-neural_cleanse (For all, do not need bad inputs)
-STRIP (For BadNet, WaNet)
-FINE_PRUNING (For BadNet, WaNet)
-CLP (For BadNet, WaNet)
-
-
-
-# Modifications
-1. made it can run in any cuda machine
+CLP, FinePrune, Neural Cleanse, STRIP, ShrinkPad
 
 
 ## How to Attack
-nohup sh train.sh Clean cifar10 'cuda:0' 50 &> logs/train_clean &
 
-nohup sh train.sh BppAttack cifar10 'cuda:1' 50 &> logs/train_bppattack &
+sh train.sh attack_method dataset device epoch
 
-nohup sh train.sh WaNet cifar10 'cuda:2' 50 &> logs/train_wanet &
+For example:
 
-nohup sh train.sh BadNet cifar10  'cuda:3' 50 &> logs/train_badnet &
+sh train.sh Clean cifar10 'cuda:0' 50 
 
-nohup sh train.sh Clean mnist 'cuda:0' 50 &> logs/train_clean &
-
-nohup sh train.sh BppAttack mnist 'cuda:1' 50 &> logs/train_bppattack &
-
-nohup sh train.sh WaNet mnist 'cuda:2' 50 &> logs/train_wanet &
-
-nohup sh train.sh BadNet mnist  'cuda:3' 50 &> logs/train_badnet &
-
+sh train.sh BppAttack cifar10 'cuda:1' 50 
 
 ## How to Defense
-### neural_cleanse
 
-nohup sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_badnet_nc_cifar10 &
+For example:
 
-nohup sh defense.sh WaNet neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_wanet_nc_cifar10 &
+sh defense.sh attack_method defense_method dataset device epoch
 
-nohup sh defense.sh BppAttack neural_cleanse cifar10 'cuda:0' 20 &> logs/defense_bppattack_nc_cifar10 &
-
-nohup sh defense.sh BadNet neural_cleanse mnist 'cuda:3' 20 &> logs/defense_badnet_nc_mnist &
-
-nohup sh defense.sh WaNet neural_cleanse mnist 'cuda:3' 20 &> logs/defense_wanet_nc_mnist &
-
-nohup sh defense.sh BppAttack neural_cleanse mnist 'cuda:3' 20 &> logs/defense_bppattack_nc_mnist &
-
-
-### STRIP
-nohup sh defense.sh BadNet STRIP cifar10 'cuda:0' 20 &> logs/defense_badnet_strip_cifar10 &
-
-nohup sh defense.sh WaNet STRIP cifar10 'cuda:0' 20 &> logs/defense_wanet_strip_cifar10 &
-
-nohup sh defense2.sh BppAttack STRIP cifar10 'cuda:0' 20 &> logs/defense_bppattack_strip_cifar10 &
-
-nohup sh defense2.sh BadNet STRIP mnist 'cuda:3' 20 &> logs/defense_badnet_strip_mnist &
-
-nohup sh defense2.sh WaNet STRIP mnist 'cuda:3' 20 &> logs/defense_wanet_strip_mnist &
-
-nohup sh defense2.sh BppAttack STRIP mnist 'cuda:3' 20 &> logs/defense_bppattack_strip_mnist &
-
-### fine_pruning
-nohup sh defense2.sh BadNet fine_pruning cifar10 'cuda:3' 20 &> logs/defense_badnet_fine_pruning_cifar10 &
-
-nohup sh defense2.sh WaNet fine_pruning cifar10 'cuda:3' 20 &> logs/defense_wanet_fine_pruning_cifar10 &
-
-nohup sh defense2.sh BppAttack fine_pruning cifar10 'cuda:3' 20 &> logs/defense_bppattack_fine_pruning_cifar10 &
-
-nohup sh defense2.sh BadNet fine_pruning mnist 'cuda:0' 20 &> logs/defense_badnet_fine_pruning_mnist &
-
-nohup sh defense2.sh WaNet fine_pruning mnist 'cuda:2' 20 &> logs/defense_wanet_fine_pruning_mnist &
-
-nohup sh defense2.sh BppAttack fine_pruning mnist 'cuda:2' 20 &> logs/defense_bppattack_fine_pruning_mnist &
-
-
-### CLP
-nohup sh defense.sh BadNet CLP cifar10 'cuda:0' 20 &> logs/defense_badnet_clp_cifar10 &
-
-nohup sh defense2.sh WaNet CLP cifar10 'cuda:2' 20 &> logs/defense_wanet_clp_cifar10 &
-
-nohup sh defense2.sh BppAttack CLP cifar10 'cuda:2' 20 &> logs/defense_bppattack_clp_cifar10 &
-
-
-nohup sh defense.sh BadNet CLP mnist 'cuda:0' 20 &> logs/defense_badnet_clp_mnist &
-
-
-
-
-
-
-
-
-
-### neural_cleanse
-
-modify detecting.py _get_classifier function, possibly need to modify the classifier's state dict key.
-
-### STRIP / Fine_Pruning
-
-STRIP.py create_backdoor function, need to add methods generating bad inputs for different methods
-
-
-
-
-
-
-
-
-
-for defenses, I modified utils.py file, if we want to combine attack and defense together, then we need to modify it too...
-
-
-
-
-Notes: BadNet, Clean is written based on WaNet file (can be combined together in the future)
+sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20
