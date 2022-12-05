@@ -26,8 +26,8 @@ def generate_blended_trigger(opt):
 
 def create_backdoor(inputs, opt, **args):
     if opt.attack == 'WaNet':
-        identity_grid = args['identity_grid']
-        noise_grid = args['noise_grid']
+        identity_grid = args['identity_grid'].to(opt.device)
+        noise_grid = args['noise_grid'].to(opt.device)
         bs = inputs.shape[0]
         grid_temps = (identity_grid + opt.s * noise_grid / opt.input_height) * opt.grid_rescale
         grid_temps = torch.clamp(grid_temps, -1, 1)

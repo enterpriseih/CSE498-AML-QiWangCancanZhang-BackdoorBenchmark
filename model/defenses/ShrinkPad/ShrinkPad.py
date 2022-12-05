@@ -56,7 +56,7 @@ def eval(netC, test_dl, opt, **args):
         total_sample += bs
 
         # Evaluating clean
-        preds_clean = netC(inputs)
+        preds_clean = netC(shrinkpad(inputs))
         correct_clean = torch.sum(torch.argmax(preds_clean, 1) == targets)
         total_correct_clean += correct_clean
         acc_clean = total_correct_clean * 100.0 / total_sample
@@ -66,9 +66,7 @@ def eval(netC, test_dl, opt, **args):
             inputs_bd = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
         else:
             inputs_bd = create_backdoor(inputs, opt)
-        print (inputs_bd.size())
         inputs_bd = shrinkpad(inputs_bd)
-        print (inputs_bd.size())
         targets_bd = torch.ones_like(targets) * opt.target_label
         preds_bd = netC(inputs_bd)
         correct_bd = torch.sum(torch.argmax(preds_bd, 1) == targets_bd)
