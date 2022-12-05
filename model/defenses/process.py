@@ -5,9 +5,12 @@ from numba import jit
 from numba.types import float64, int64
 from PIL import Image
 import bchlib
-import tensorflow as tf
-from tensorflow.python.saved_model import tag_constants
-from tensorflow.python.saved_model import signature_constants
+try:
+    import tensorflow as tf
+    from tensorflow.python.saved_model import tag_constants
+    from tensorflow.python.saved_model import signature_constants
+except:
+    pass
 import sys
 
 sys.path.append("../..")

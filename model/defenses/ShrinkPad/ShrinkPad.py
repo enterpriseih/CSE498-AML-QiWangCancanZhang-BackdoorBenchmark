@@ -25,9 +25,9 @@ def RandomPad(sum_w, sum_h, fill=0):
 
     return transforms_bag
 
-def build_ShrinkPad(size_map, pad):
+def build_ShrinkPad(h, w, pad):
     return transforms.Compose([
-        transforms.Resize((size_map - pad, size_map - pad)),
+        transforms.Resize((h - pad, w - pad)),
         transforms.RandomChoice(RandomPad(sum_w=pad, sum_h=pad))
         ])
 
@@ -48,11 +48,10 @@ def eval(netC, test_dl, opt, **args):
     total_correct_bd = 0
 
 
-    shrinkpad = build_ShrinkPad((opt.input_height,opt.input_width), opt.pad)
+    shrinkpad = build_ShrinkPad(opt.input_height,opt.input_width, opt.pad)
 
     for batch_idx, (inputs, targets) in enumerate(test_dl):
         inputs, targets = inputs.to(opt.device), targets.to(opt.device)
-        inputs = shrinkpad(inputs)
         bs = inputs.shape[0]
         total_sample += bs
 
@@ -67,7 +66,9 @@ def eval(netC, test_dl, opt, **args):
             inputs_bd = create_backdoor(inputs, opt, identity_grid=identity_grid, noise_grid=noise_grid)
         else:
             inputs_bd = create_backdoor(inputs, opt)
-
+        print (inputs_bd.size())
+        inputs_bd = shrinkpad(inputs_bd)
+        print (inputs_bd.size())
         targets_bd = torch.ones_like(targets) * opt.target_label
         preds_bd = netC(inputs_bd)
         correct_bd = torch.sum(torch.argmax(preds_bd, 1) == targets_bd)

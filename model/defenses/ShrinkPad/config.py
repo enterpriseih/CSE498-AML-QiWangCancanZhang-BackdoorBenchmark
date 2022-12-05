@@ -24,7 +24,12 @@ def get_arguments():
     parser.add_argument("--attack_mode", type=str, default="all2one", help="all2one or all2all")
     parser.add_argument("--target_label", type=int, default=0)
     parser.add_argument("--results", type=str, default="./results.txt")
-    parser.add_argument("--pad", type=int, default=5)
+    parser.add_argument("--s", type=float, default=0.5)
+    parser.add_argument("--k", type=int, default=4)  # low-res grid size
+    parser.add_argument(
+        "--grid-rescale", type=float, default=1
+    )  # scale grid values to avoid going out of [-1, 1]. For example, grid-rescale = 0.98
+    parser.add_argument("--pad", type=int, default=10)
 
     # for bppattack
     parser.add_argument("--squeeze_num", type=int, default=32)
