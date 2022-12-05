@@ -24,8 +24,8 @@ sh train.sh BppAttack cifar10 'cuda:1' 50
 
 ## How to Defense
 
-For example:
-
 sh defense.sh attack_method defense_method dataset device epoch
+
+For example:
 
 sh defense.sh BadNet neural_cleanse cifar10 'cuda:0' 20
